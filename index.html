@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width">
     <title>Professional Proofreader App</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.1.0/diff.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <style>
         body { 
             font-family: Lora; 
@@ -47,7 +47,6 @@
             font-family: Lora;
         }
         
-        /* สไตล์สำหรับส่วนควบคุม AI */
         .ai-controls {
             display: flex;
             justify-content: center;
@@ -123,20 +122,69 @@
             margin: 0 auto;
             color: #212529;
         }
-        .nyt-header { text-align: center; font-family: 'UnifrakturMaguntia'; font-size: 70px; color: #212529; margin-bottom: 10px; line-height: 1; }
+
+        .nyt-top-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .nyt-slogan-box {
+            position: absolute;
+            left: 0;
+            border: 1px solid #212529;
+            padding: 6px 10px;
+            font-family: Lora;
+            font-size: 11px;
+            text-align: center;
+            font-style: italic;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .nyt-header { text-align: center; font-family: 'UnifrakturMaguntia'; font-size: 70px; color: #212529; line-height: 1; }
         .nyt-date-line { font-family: Lora; font-size: 12px; text-transform: uppercase; display: flex; justify-content: space-between; border-top: 1px solid #212529; border-bottom: 2px solid #212529; padding: 8px 0; margin-bottom: 35px; font-weight: bold; letter-spacing: 1px; }
         .nyt-title { font-family: 'Playfair Display'; font-size: 52px; font-weight: 900; line-height: 1.1; text-align: left; margin-top: 0; margin-bottom: 20px; }
-        .nyt-author { font-family: Lora; font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 30px; border-bottom: 1px solid #dee2e6; padding-bottom: 10px; }
-        .nyt-content { font-family: Lora; font-size: 16px; line-height: 1.7; column-count: 3; column-gap: 40px; column-rule: 1px solid #dee2e6; text-align: justify; }
+        
+        .nyt-content { font-family: Lora; font-size: 16px; line-height: 1.7; column-count: 3; column-gap: 25px; column-rule: 3px solid #6c757d; text-align: justify; }
         .nyt-content p { margin-top: 0; margin-bottom: 1.2em; text-indent: 2em; }
-        .lang-en .nyt-content p:first-of-type::first-letter { font-size: 4.5em; float: left; line-height: 0.8; margin-right: 10px; margin-top: 5px; font-family: 'Playfair Display'; font-weight: 900; }
+        
+        .nyt-inline-subheading {
+            font-family: 'Playfair Display';
+            font-size: 20px;
+            text-align: center;
+            padding: 10px 0;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            break-inside: avoid;
+            position: relative;
+        }
+        
+        .nyt-inline-subheading::before,
+        .nyt-inline-subheading::after {
+            content: '';
+            position: absolute;
+            left: 25%;
+            width: 50%;
+            height: 1px;
+            background-color: #6c757d;
+        }
+        
+        .nyt-inline-subheading::before {
+            top: 0;
+        }
+        
+        .nyt-inline-subheading::after {
+            bottom: 0;
+        }
         
         .lang-th .nyt-header { font-family: 'Chonburi'; font-size: 65px; }
         .lang-th .nyt-date-line { font-family: 'Sarabun'; font-size: 14px; }
         .lang-th .nyt-title { font-family: 'Pridi'; }
-        .lang-th .nyt-author { font-family: 'Sarabun'; }
         .lang-th .nyt-content { font-family: 'Sarabun'; font-size: 18px; }
-        .lang-th .nyt-content p:first-of-type::first-letter { font-size: 3.5em; float: left; line-height: 1; margin-right: 8px; font-family: 'Pridi'; font-weight: 700; }
+        .lang-th .nyt-slogan-box { display: none; }
     </style>
 </head>
 <body>
@@ -176,17 +224,22 @@
     </div>
 
     <div class="newspaper-container lang-en" id="result-newspaper">
-        <div class="nyt-header">The Global Times</div>
+        <div class="nyt-top-row">
+            <div class="nyt-slogan-box">
+                All the News<br>That's Fit to Post
+            </div>
+            <div class="nyt-header">The Siam Times</div>
+        </div>
         <div class="nyt-date-line"></div>
+        
         <div class="nyt-title" id="nyt-title-display">LATEST UPDATES</div>
-        <div class="nyt-author">By THE EDITORIAL BOARD</div>
+
         <div class="nyt-content" id="nyt-body">
             <em>Newspaper content will be displayed here...</em>
         </div>
     </div>
 
     <script>
-        // ฟังก์ชันเรียกใช้ Gemini API
 async function rewriteText() {
     const draft = document.getElementById('draft').value;
     const finalBox = document.getElementById('final');
@@ -200,17 +253,18 @@ async function rewriteText() {
     
     finalBox.value = 'กำลังประมวลผลด้วย AI โปรดรอสักครู่...';
 
-    // วาง URL ของ Web App ที่ได้จาก Google Apps Script ที่นี่
+    // เพิ่มคำสั่งพิเศษเพื่อบังคับการจัดรูปแบบ
+    const instructionPrompt = "You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 and onwards must be the Main Content. \n\nOriginal Text to rewrite:\n";
+    const augmentedDraft = instructionPrompt + draft;
+
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbySUJvCYbctRhB00m_h5_8w5sA-FBy5gM-sCMeAOavM5g2dTQH6pTAUtc0jlEyTQvKK/exec';
 
     try {
-        // การส่งข้อมูลไปที่ GAS ต้องระบุ Content-Type เป็น text/plain 
-        // เพื่อป้องกันไม่ให้เบราว์เซอร์ส่ง OPTIONS request ซึ่ง GAS ไม่รองรับ
         const response = await fetch(scriptUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
-                draft: draft,
+                draft: augmentedDraft,
                 style: style
             })
         });
@@ -242,7 +296,6 @@ function compareTexts() {
     newspaperDiv.style.display = 'none';
     resultDiv.style.display = 'block';
 
-    // ลบการใช้ eval() ออก และเรียกใช้ Diff.diffWords โดยตรง
     const diff = Diff.diffWords(draft, final);
     
     resultDiv.innerHTML = '';
@@ -265,107 +318,121 @@ function compareTexts() {
     resultDiv.appendChild(fragment);
 }
 
-  
-        function generateNewspaper(lang) {
-            const final = document.getElementById('final').value;
-            const resultDiv = document.getElementById('result-proofread');
-            const newspaperDiv = document.getElementById('result-newspaper');
-            const contentDiv = document.getElementById('nyt-body');
-            const titleDiv = document.getElementById('nyt-title-display');
-            const dateLineDiv = document.querySelector('.nyt-date-line');
-            const headerDiv = document.querySelector('.nyt-header');
-            const authorDiv = document.querySelector('.nyt-author');
+function generateNewspaper(lang) {
+    const final = document.getElementById('final').value;
+    const resultDiv = document.getElementById('result-proofread');
+    const newspaperDiv = document.getElementById('result-newspaper');
+    const contentDiv = document.getElementById('nyt-body');
+    const titleDiv = document.getElementById('nyt-title-display');
+    const dateLineDiv = document.querySelector('.nyt-date-line');
+    const headerDiv = document.querySelector('.nyt-header');
 
-            if (!final) {
-                alert('Please enter text in the Final box');
-                return;
-            }
+    if (!final) {
+        alert('Please enter text in the Final box');
+        return;
+    }
 
-            resultDiv.style.display = 'none';
-            newspaperDiv.style.display = 'block';
+    resultDiv.style.display = 'none';
+    newspaperDiv.style.display = 'block';
 
-            if (lang === 'th') {
-                newspaperDiv.classList.add('lang-th');
-                newspaperDiv.classList.remove('lang-en');
-                headerDiv.innerText = 'เดอะ สยาม ไทมส์';
-                authorDiv.innerText = 'โดย กองบรรณาธิการ';
-            } else {
-                newspaperDiv.classList.add('lang-en');
-                newspaperDiv.classList.remove('lang-th');
-                headerDiv.innerText = 'The Global Times';
-                authorDiv.innerText = 'By THE EDITORIAL BOARD';
-            }
+    const paragraphs = final.split(/\n+/).filter(p => p.trim() !== '');
+    
+    if (paragraphs.length >= 1) {
+        titleDiv.innerText = paragraphs[0];
+    }
 
-            const paragraphs = final.split(/\n+/).filter(p => p.trim() !== '');
-            
-            if (paragraphs.length >= 1) {
-                titleDiv.innerText = paragraphs[0];
-            }
+    if (lang === 'th') {
+        newspaperDiv.classList.add('lang-th');
+        newspaperDiv.classList.remove('lang-en');
+        headerDiv.innerText = 'เดอะ สยาม ไทมส์';
 
-            if (paragraphs.length === 1) {
-                contentDiv.innerHTML = '<p>No additional content provided.</p>';
-            } else {
-                const bodyPars = paragraphs.slice(1);
-                contentDiv.innerHTML = bodyPars.map(p => '<p>' + p + '</p>').join('');
-            }
-
-            const now = new Date();
-            const hour = now.getHours();
-            const dateNum = now.getDate();
-            const year = now.getFullYear();
-            const monthIdx = now.getMonth();
-            const dayIdx = now.getDay();
-
-            const enDays = 'SUNDAY MONDAY TUESDAY WEDNESDAY THURSDAY FRIDAY SATURDAY'.split(' ');
-            const thDays = 'อาทิตย์ จันทร์ อังคาร พุธ พฤหัสบดี ศุกร์ เสาร์'.split(' ');
-            
-            const enMonths = 'JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY AUGUST SEPTEMBER OCTOBER NOVEMBER DECEMBER'.split(' ');
-            const thMonths = 'มกราคม กุมภาพันธ์ มีนาคม เมษายน พฤษภาคม มิถุนายน กรกฎาคม สิงหาคม กันยายน ตุลาคม พฤศจิกายน ธันวาคม'.split(' ');
-
-            const issueNo = (monthIdx + 1) * 10000 + dateNum * 100 + hour;
-
-            let dateHTML = '';
-
-            if (lang === 'th') {
-                const thYear = year + 543;
-                const dName = thDays[dayIdx];
-                const mName = thMonths[monthIdx];
-                
-                const span1 = '<span>ปีที่ ' + (year - 2020) + ' ฉบับที่ ' + issueNo + '</span>';
-                const span2 = '<span>วัน' + dName + 'ที่ ' + dateNum + ' ' + mName + ' พ.ศ. ' + thYear + '</span>';
-                const span3 = '<span>ราคา 15 บาท</span>';
-                
-                dateHTML = span1 + span2 + span3;
-            } else {
-                const dName = enDays[dayIdx];
-                const mName = enMonths[monthIdx];
-                
-                let volNum = year - 1851;
-                let volRoman = '';
-                
-                while (volNum >= 1000) { volRoman += 'M'; volNum -= 1000; }
-                while (volNum >= 900) { volRoman += 'CM'; volNum -= 900; }
-                while (volNum >= 500) { volRoman += 'D'; volNum -= 500; }
-                while (volNum >= 400) { volRoman += 'CD'; volNum -= 400; }
-                while (volNum >= 100) { volRoman += 'C'; volNum -= 100; }
-                while (volNum >= 90) { volRoman += 'XC'; volNum -= 90; }
-                while (volNum >= 50) { volRoman += 'L'; volNum -= 50; }
-                while (volNum >= 40) { volRoman += 'XL'; volNum -= 40; }
-                while (volNum >= 10) { volRoman += 'X'; volNum -= 10; }
-                while (volNum >= 9) { volRoman += 'IX'; volNum -= 9; }
-                while (volNum >= 5) { volRoman += 'V'; volNum -= 5; }
-                while (volNum >= 4) { volRoman += 'IV'; volNum -= 4; }
-                while (volNum >= 1) { volRoman += 'I'; volNum -= 1; }
-
-                const span1 = '<span>VOL. ' + volRoman + '... No. ' + issueNo + '</span>';
-                const span2 = '<span>NEW YORK ' + dName + ' ' + mName + ' ' + dateNum + ' ' + year + '</span>';
-                const span3 = '<span>$3.00</span>';
-                
-                dateHTML = span1 + span2 + span3;
-            }
-
-            dateLineDiv.innerHTML = dateHTML;
+        if (paragraphs.length === 1) {
+            contentDiv.innerHTML = '<p>No additional content provided.</p>';
+        } else {
+            const bodyPars = paragraphs.slice(1);
+            contentDiv.innerHTML = bodyPars.map(p => `<p>${p}</p>`).join('');
         }
+
+    } else {
+        newspaperDiv.classList.add('lang-en');
+        newspaperDiv.classList.remove('lang-th');
+        headerDiv.innerText = 'The Siam Times';
+
+        let newContentHTML = '';
+
+        if (paragraphs.length >= 2) {
+            newContentHTML += `<div class="nyt-inline-subheading">${paragraphs[1]}</div>`;
+
+            if (paragraphs.length > 2) {
+                const bodyPars = paragraphs.slice(2);
+                newContentHTML += bodyPars.map(p => `<p>${p}</p>`).join('');
+            } else {
+                newContentHTML += '<p>No additional content provided.</p>';
+            }
+        } else {
+            newContentHTML += '<p>No additional content provided.</p>';
+        }
+
+        contentDiv.innerHTML = newContentHTML;
+    }
+
+    const now = new Date();
+    const hour = now.getHours();
+    const dateNum = now.getDate();
+    const year = now.getFullYear();
+    const monthIdx = now.getMonth();
+    const dayIdx = now.getDay();
+
+    const enDays = 'SUNDAY MONDAY TUESDAY WEDNESDAY THURSDAY FRIDAY SATURDAY'.split(' ');
+    const thDays = 'อาทิตย์ จันทร์ อังคาร พุธ พฤหัสบดี ศุกร์ เสาร์'.split(' ');
+    
+    const enMonths = 'JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY AUGUST SEPTEMBER OCTOBER NOVEMBER DECEMBER'.split(' ');
+    const thMonths = 'มกราคม กุมภาพันธ์ มีนาคม เมษายน พฤษภาคม มิถุนายน กรกฎาคม สิงหาคม กันยายน ตุลาคม พฤศจิกายน ธันวาคม'.split(' ');
+
+    const issueNo = (monthIdx + 1) * 10000 + dateNum * 100 + hour;
+
+    let dateHTML = '';
+
+    if (lang === 'th') {
+        const thYear = year + 543;
+        const dName = thDays[dayIdx];
+        const mName = thMonths[monthIdx];
+        
+        const span1 = '<span>ปีที่ ' + (year - 2020) + ' ฉบับที่ ' + issueNo + '</span>';
+        const span2 = '<span>วัน' + dName + 'ที่ ' + dateNum + ' ' + mName + ' พ.ศ. ' + thYear + '</span>';
+        const span3 = '<span>ราคา 15 บาท</span>';
+        
+        dateHTML = span1 + span2 + span3;
+    } else {
+        const dName = enDays[dayIdx];
+        const mName = enMonths[monthIdx];
+        
+        let volNum = year - 1851;
+        let volRoman = '';
+        
+        while (volNum >= 1000) { volRoman += 'M'; volNum -= 1000; }
+        while (volNum >= 900) { volRoman += 'CM'; volNum -= 900; }
+        while (volNum >= 500) { volRoman += 'D'; volNum -= 500; }
+        while (volNum >= 400) { volRoman += 'CD'; volNum -= 400; }
+        while (volNum >= 100) { volRoman += 'C'; volNum -= 100; }
+        while (volNum >= 90) { volRoman += 'XC'; volNum -= 90; }
+        while (volNum >= 50) { volRoman += 'L'; volNum -= 50; }
+        while (volNum >= 40) { volRoman += 'XL'; volNum -= 40; }
+        while (volNum >= 10) { volRoman += 'X'; volNum -= 10; }
+        while (volNum >= 9) { volRoman += 'IX'; volNum -= 9; }
+        while (volNum >= 5) { volRoman += 'V'; volNum -= 5; }
+        while (volNum >= 4) { volRoman += 'IV'; volNum -= 4; }
+        while (volNum >= 1) { volRoman += 'I'; volNum -= 1; }
+
+        const span1 = '<span>VOL. ' + volRoman + '... No. ' + issueNo + '</span>';
+        const span2 = '<span>BANGKOK, THAILAND ' + dName + ' ' + mName + ' ' + dateNum + ' ' + year + '</span>';
+        const span3 = '<span>$3.00</span>';
+        
+        dateHTML = span1 + span2 + span3;
+    }
+
+    dateLineDiv.innerHTML = dateHTML;
+}
     </script>
 
 </body>
