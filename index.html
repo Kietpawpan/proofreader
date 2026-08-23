@@ -46,6 +46,34 @@
             line-height: 1.6;
             font-family: Lora;
         }
+        
+        /* สไตล์สำหรับส่วนควบคุม AI */
+        .ai-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px #0000001a;
+        }
+        .ai-controls select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            font-family: Lora;
+        }
+        .btn-ai {
+            background: #6f42c1;
+            padding: 10px 20px;
+        }
+        .btn-ai:hover {
+            background: #59339d;
+        }
+
         .btn-group {
             display: flex;
             justify-content: center;
@@ -64,30 +92,13 @@
             transition: all 0.3s; 
             box-shadow: 0 4px 6px #0000001a;
         }
-        .btn-proofread {
-            background: #0d6efd; 
-        }
-        .btn-proofread:hover { 
-            background: #0b5ed7; 
-        }
-        .btn-nyt {
-            background: #212529; 
-            font-family: 'Playfair Display';
-        }
-        .btn-nyt:hover {
-            background: #f8f9fa;
-            color: #212529;
-            border: 1px solid #212529;
-        }
-        .btn-thai {
-            background: #b91d1d;
-            font-family: 'Sarabun';
-        }
-        .btn-thai:hover {
-            background: #f8f9fa;
-            color: #b91d1d;
-            border: 1px solid #b91d1d;
-        }
+        .btn-proofread { background: #0d6efd; }
+        .btn-proofread:hover { background: #0b5ed7; }
+        .btn-nyt { background: #212529; font-family: 'Playfair Display'; }
+        .btn-nyt:hover { background: #f8f9fa; color: #212529; border: 1px solid #212529; }
+        .btn-thai { background: #b91d1d; font-family: 'Sarabun'; }
+        .btn-thai:hover { background: #f8f9fa; color: #b91d1d; border: 1px solid #b91d1d; }
+        
         .result-container { 
             background: white; 
             padding: 40px; 
@@ -99,21 +110,9 @@
             white-space: pre-wrap;
             display: block; 
         }
-        del { 
-            text-decoration: line-through; 
-            color: #dc3545; 
-            background: #f8d7da; 
-            padding: 2px 4px; 
-            border-radius: 4px; 
-        }
-        ins { 
-            text-decoration: none; 
-            color: #198754; 
-            background: #d1e7dd; 
-            padding: 2px 4px; 
-            border-bottom: 2px dashed #198754; 
-            font-weight: bold; 
-        }
+        del { text-decoration: line-through; color: #dc3545; background: #f8d7da; padding: 2px 4px; border-radius: 4px; }
+        ins { text-decoration: none; color: #198754; background: #d1e7dd; padding: 2px 4px; border-bottom: 2px dashed #198754; font-weight: bold; }
+        
         .newspaper-container {
             background: #fdfbf7; 
             padding: 40px 60px;
@@ -124,101 +123,36 @@
             margin: 0 auto;
             color: #212529;
         }
-        .nyt-header {
-            text-align: center;
-            font-family: 'UnifrakturMaguntia';
-            font-size: 70px;
-            color: #212529;
-            margin-bottom: 10px;
-            line-height: 1;
-        }
-        .nyt-date-line {
-            font-family: Lora;
-            font-size: 12px;
-            text-transform: uppercase;
-            display: flex;
-            justify-content: space-between;
-            border-top: 1px solid #212529;
-            border-bottom: 2px solid #212529;
-            padding: 8px 0;
-            margin-bottom: 35px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        .nyt-title {
-            font-family: 'Playfair Display';
-            font-size: 52px;
-            font-weight: 900;
-            line-height: 1.1;
-            text-align: left;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-        .nyt-author {
-            font-family: Lora;
-            font-size: 14px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #dee2e6;
-            padding-bottom: 10px;
-        }
-        .nyt-content {
-            font-family: Lora;
-            font-size: 16px;
-            line-height: 1.7;
-            column-count: 3; 
-            column-gap: 40px;
-            column-rule: 1px solid #dee2e6;
-            text-align: justify; 
-        }
-        .nyt-content p {
-            margin-top: 0;
-            margin-bottom: 1.2em;
-            text-indent: 2em; 
-        }
-        .lang-en .nyt-content p:first-of-type::first-letter {
-            font-size: 4.5em;
-            float: left;
-            line-height: 0.8;
-            margin-right: 10px;
-            margin-top: 5px;
-            font-family: 'Playfair Display';
-            font-weight: 900;
-        }
+        .nyt-header { text-align: center; font-family: 'UnifrakturMaguntia'; font-size: 70px; color: #212529; margin-bottom: 10px; line-height: 1; }
+        .nyt-date-line { font-family: Lora; font-size: 12px; text-transform: uppercase; display: flex; justify-content: space-between; border-top: 1px solid #212529; border-bottom: 2px solid #212529; padding: 8px 0; margin-bottom: 35px; font-weight: bold; letter-spacing: 1px; }
+        .nyt-title { font-family: 'Playfair Display'; font-size: 52px; font-weight: 900; line-height: 1.1; text-align: left; margin-top: 0; margin-bottom: 20px; }
+        .nyt-author { font-family: Lora; font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 30px; border-bottom: 1px solid #dee2e6; padding-bottom: 10px; }
+        .nyt-content { font-family: Lora; font-size: 16px; line-height: 1.7; column-count: 3; column-gap: 40px; column-rule: 1px solid #dee2e6; text-align: justify; }
+        .nyt-content p { margin-top: 0; margin-bottom: 1.2em; text-indent: 2em; }
+        .lang-en .nyt-content p:first-of-type::first-letter { font-size: 4.5em; float: left; line-height: 0.8; margin-right: 10px; margin-top: 5px; font-family: 'Playfair Display'; font-weight: 900; }
         
-        /* สไตล์สำหรับหนังสือพิมพ์ภาษาไทย */
-        .lang-th .nyt-header {
-            font-family: 'Chonburi';
-            font-size: 65px;
-        }
-        .lang-th .nyt-date-line {
-            font-family: 'Sarabun';
-            font-size: 14px;
-        }
-        .lang-th .nyt-title {
-            font-family: 'Pridi';
-        }
-        .lang-th .nyt-author {
-            font-family: 'Sarabun';
-        }
-        .lang-th .nyt-content {
-            font-family: 'Sarabun';
-            font-size: 18px;
-        }
-        .lang-th .nyt-content p:first-of-type::first-letter {
-            font-size: 3.5em;
-            float: left;
-            line-height: 1;
-            margin-right: 8px;
-            font-family: 'Pridi';
-            font-weight: 700;
-        }
+        .lang-th .nyt-header { font-family: 'Chonburi'; font-size: 65px; }
+        .lang-th .nyt-date-line { font-family: 'Sarabun'; font-size: 14px; }
+        .lang-th .nyt-title { font-family: 'Pridi'; }
+        .lang-th .nyt-author { font-family: 'Sarabun'; }
+        .lang-th .nyt-content { font-family: 'Sarabun'; font-size: 18px; }
+        .lang-th .nyt-content p:first-of-type::first-letter { font-size: 3.5em; float: left; line-height: 1; margin-right: 8px; font-family: 'Pridi'; font-weight: 700; }
     </style>
 </head>
 <body>
 
     <h2>Professional Proofreader App</h2>
+
+    <div class="ai-controls">
+        <label for="ai-style">AI Rewrite Style:</label>
+        <select id="ai-style">
+            <option value="the New York Times">New York Times</option>
+            <option value="Strunk and White (The Elements of Style)">Strunk and White</option>
+            <option value="Academic English">Academic English</option>
+            <option value="the King James Bible">King James' Bible</option>
+        </select>
+        <button class="btn-ai" onclick="rewriteText()">✨ Generate Final Draft</button>
+    </div>
 
     <div class="container">
         <div class="box">
@@ -252,44 +186,86 @@
     </div>
 
     <script>
-        function compareTexts() {
-            const draft = document.getElementById('draft').value;
-            const final = document.getElementById('final').value;
-            const resultDiv = document.getElementById('result-proofread');
-            const newspaperDiv = document.getElementById('result-newspaper');
+        // ฟังก์ชันเรียกใช้ Gemini API
+async function rewriteText() {
+    const draft = document.getElementById('draft').value;
+    const finalBox = document.getElementById('final');
+    
+    if (!draft) {
+        alert('กรุณาใส่ข้อความในช่อง Draft ก่อนใช้งาน AI ครับ');
+        return;
+    }
 
-            if (!draft && !final) {
-                alert('Please enter text in both fields');
-                return;
-            }
+    const style = document.getElementById('ai-style').value;
+    
+    finalBox.value = 'กำลังประมวลผลด้วย AI โปรดรอสักครู่...';
 
-            newspaperDiv.style.display = 'none';
-            resultDiv.style.display = 'block';
+    // วาง URL ของ Web App ที่ได้จาก Google Apps Script ที่นี่
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbySUJvCYbctRhB00m_h5_8w5sA-FBy5gM-sCMeAOavM5g2dTQH6pTAUtc0jlEyTQvKK/exec';
 
-            const c = String.fromCharCode(44);
-            const code = 'Diff.diffWords(draft' + c + ' final)';
-            const diff = eval(code);
-            
-            resultDiv.innerHTML = '';
-            const fragment = document.createDocumentFragment();
+    try {
+        // การส่งข้อมูลไปที่ GAS ต้องระบุ Content-Type เป็น text/plain 
+        // เพื่อป้องกันไม่ให้เบราว์เซอร์ส่ง OPTIONS request ซึ่ง GAS ไม่รองรับ
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+                draft: draft,
+                style: style
+            })
+        });
 
-            diff.forEach((part) => {
-                const span = document.createElement(part.added ? 'ins' : part.removed ? 'del' : 'span');
-                const lines = part.value.split('\n');
-                
-                for (let i = 0; i < lines.length; i++) {
-                    span.appendChild(document.createTextNode(lines[i]));
-                    if (i < lines.length - 1) {
-                        span.appendChild(document.createElement('br'));
-                    }
-                }
-                
-                fragment.appendChild(span);
-            });
-
-            resultDiv.appendChild(fragment);
+        const data = await response.json();
+        
+        if (data.result) {
+            finalBox.value = data.result;
+        } else {
+            finalBox.value = 'เกิดข้อผิดพลาดจาก Backend: ' + (data.error || 'Unknown error');
         }
+    } catch (error) {
+        finalBox.value = 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์';
+        console.error(error);
+    }
+}
 
+function compareTexts() {
+    const draft = document.getElementById('draft').value;
+    const final = document.getElementById('final').value;
+    const resultDiv = document.getElementById('result-proofread');
+    const newspaperDiv = document.getElementById('result-newspaper');
+
+    if (!draft && !final) {
+        alert('Please enter text in both fields');
+        return;
+    }
+
+    newspaperDiv.style.display = 'none';
+    resultDiv.style.display = 'block';
+
+    // ลบการใช้ eval() ออก และเรียกใช้ Diff.diffWords โดยตรง
+    const diff = Diff.diffWords(draft, final);
+    
+    resultDiv.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+
+    diff.forEach((part) => {
+        const span = document.createElement(part.added ? 'ins' : part.removed ? 'del' : 'span');
+        const lines = part.value.split('\n');
+        
+        for (let i = 0; i < lines.length; i++) {
+            span.appendChild(document.createTextNode(lines[i]));
+            if (i < lines.length - 1) {
+                span.appendChild(document.createElement('br'));
+            }
+        }
+        
+        fragment.appendChild(span);
+    });
+
+    resultDiv.appendChild(fragment);
+}
+
+  
         function generateNewspaper(lang) {
             const final = document.getElementById('final').value;
             const resultDiv = document.getElementById('result-proofread');
