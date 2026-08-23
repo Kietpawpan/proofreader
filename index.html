@@ -184,6 +184,7 @@
         .lang-th .nyt-date-line { font-family: 'Sarabun'; font-size: 14px; }
         .lang-th .nyt-title { font-family: 'Pridi'; }
         .lang-th .nyt-content { font-family: 'Sarabun'; font-size: 18px; }
+        .lang-th .nyt-inline-subheading { font-family: 'Pridi'; font-size: 22px; font-weight: 700; }
         .lang-th .nyt-slogan-box { display: none; }
     </style>
 </head>
@@ -226,9 +227,9 @@
     <div class="newspaper-container lang-en" id="result-newspaper">
         <div class="nyt-top-row">
             <div class="nyt-slogan-box">
-                All the News<br>That's Fit to Post
+                All the News<br>That's Fit to Print
             </div>
-            <div class="nyt-header">The Siam Times</div>
+            <div class="nyt-header">The Global Times</div>
         </div>
         <div class="nyt-date-line"></div>
         
@@ -253,7 +254,6 @@ async function rewriteText() {
     
     finalBox.value = 'กำลังประมวลผลด้วย AI โปรดรอสักครู่...';
 
-    // เพิ่มคำสั่งพิเศษเพื่อบังคับการจัดรูปแบบ
     const instructionPrompt = "You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 and onwards must be the Main Content. \n\nOriginal Text to rewrite:\n";
     const augmentedDraft = instructionPrompt + draft;
 
@@ -318,7 +318,7 @@ function compareTexts() {
     resultDiv.appendChild(fragment);
 }
 
-function generateNewspaper(lang) {
+async function generateNewspaper(lang) {
     const final = document.getElementById('final').value;
     const resultDiv = document.getElementById('result-proofread');
     const newspaperDiv = document.getElementById('result-newspaper');
@@ -335,46 +335,102 @@ function generateNewspaper(lang) {
     resultDiv.style.display = 'none';
     newspaperDiv.style.display = 'block';
 
-    const paragraphs = final.split(/\n+/).filter(p => p.trim() !== '');
+    let processedText = final;
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbySUJvCYbctRhB00m_h5_8w5sA-FBy5gM-sCMeAOavM5g2dTQH6pTAUtc0jlEyTQvKK/exec';
     
-    if (paragraphs.length >= 1) {
-        titleDiv.innerText = paragraphs[0];
-    }
+    const currentStyle = document.getElementById('ai-style').value;
 
     if (lang === 'th') {
         newspaperDiv.classList.add('lang-th');
         newspaperDiv.classList.remove('lang-en');
         headerDiv.innerText = 'เดอะ สยาม ไทมส์';
 
-        if (paragraphs.length === 1) {
-            contentDiv.innerHTML = '<p>No additional content provided.</p>';
-        } else {
-            const bodyPars = paragraphs.slice(1);
-            contentDiv.innerHTML = bodyPars.map(p => `<p>${p}</p>`).join('');
-        }
+        const englishCharCount = (final.match(/[a-zA-Z]/g) || []).length;
+        const isEnglish = englishCharCount > final.length * 0.2;
 
+        if (isEnglish) {
+            titleDiv.innerText = 'กำลังประมวลผล...';
+            contentDiv.innerHTML = '<p>กำลังแปลภาษาเป็นไทย โปรดรอสักครู่...</p>';
+            
+            const translatePrompt = "Translate the following text to Thai. You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
+            
+            try {
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        draft: translatePrompt,
+                        style: 'Thai Newspaper'
+                    })
+                });
+                const data = await response.json();
+                if (data.result) {
+                    processedText = data.result;
+                }
+            } catch (error) {
+                console.error(error);
+                contentDiv.innerHTML = '<p>เกิดข้อผิดพลาดในการแปลภาษา</p>';
+                return;
+            }
+        }
     } else {
         newspaperDiv.classList.add('lang-en');
         newspaperDiv.classList.remove('lang-th');
-        headerDiv.innerText = 'The Siam Times';
+        headerDiv.innerText = 'The Global Times';
+        
+        const thaiCharCount = (final.match(/[\u0E00-\u0E7F]/g) || []).length;
+        const isThai = thaiCharCount > final.length * 0.1;
 
-        let newContentHTML = '';
-
-        if (paragraphs.length >= 2) {
-            newContentHTML += `<div class="nyt-inline-subheading">${paragraphs[1]}</div>`;
-
-            if (paragraphs.length > 2) {
-                const bodyPars = paragraphs.slice(2);
-                newContentHTML += bodyPars.map(p => `<p>${p}</p>`).join('');
-            } else {
-                newContentHTML += '<p>No additional content provided.</p>';
+        if (isThai) {
+            titleDiv.innerText = 'Processing...';
+            contentDiv.innerHTML = '<p>Translating to English. Please wait...</p>';
+            
+            const translatePrompt = "Translate the following text to English in the style of " + currentStyle + ". You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
+            
+            try {
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        draft: translatePrompt,
+                        style: currentStyle
+                    })
+                });
+                const data = await response.json();
+                if (data.result) {
+                    processedText = data.result;
+                }
+            } catch (error) {
+                console.error(error);
+                contentDiv.innerHTML = '<p>Error translating text.</p>';
+                return;
             }
-        } else {
-            newContentHTML += '<p>No additional content provided.</p>';
         }
-
-        contentDiv.innerHTML = newContentHTML;
     }
+
+    const paragraphs = processedText.split(/\n+/).filter(p => p.trim() !== '');
+    
+    if (paragraphs.length >= 1) {
+        titleDiv.innerText = paragraphs[0];
+    }
+
+    let newContentHTML = '';
+    const noContentMsg = lang === 'th' ? 'ไม่มีเนื้อหาเพิ่มเติม' : 'No additional content provided.';
+
+    if (paragraphs.length >= 2) {
+        newContentHTML += `<div class="nyt-inline-subheading">${paragraphs[1]}</div>`;
+
+        if (paragraphs.length > 2) {
+            const bodyPars = paragraphs.slice(2);
+            newContentHTML += bodyPars.map(p => `<p>${p}</p>`).join('');
+        } else {
+            newContentHTML += `<p>${noContentMsg}</p>`;
+        }
+    } else {
+        newContentHTML += `<p>${noContentMsg}</p>`;
+    }
+
+    contentDiv.innerHTML = newContentHTML;
 
     const now = new Date();
     const hour = now.getHours();
@@ -425,7 +481,7 @@ function generateNewspaper(lang) {
         while (volNum >= 1) { volRoman += 'I'; volNum -= 1; }
 
         const span1 = '<span>VOL. ' + volRoman + '... No. ' + issueNo + '</span>';
-        const span2 = '<span>BANGKOK, THAILAND ' + dName + ' ' + mName + ' ' + dateNum + ' ' + year + '</span>';
+        const span2 = '<span>NEW YORK ' + dName + ' ' + mName + ' ' + dateNum + ' ' + year + '</span>';
         const span3 = '<span>$3.00</span>';
         
         dateHTML = span1 + span2 + span3;
