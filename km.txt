@@ -16,3 +16,13 @@ Original Text:
 
 ข้อความต้นฉบับ:
 [วางข้อความต้นฉบับของคุณที่นี่]
+
+------------------------
+Please translate the following official Thai text into English and rewrite it in the style of the New York Times. You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'.
+
+Paragraph 1 must be the Title
+Paragraph 2 must be the Subtitle
+Paragraph 3 and onwards must be the Main Content
+
+Original Text:
+[วางข้อความภาษาไทยจากเจ้าหน้าที่ตรงนี้]
