@@ -7,12 +7,12 @@
   "theme_color": "#6b21a8",
   "icons": [
     {
-      "src": "proof.png",
+      "src": "https://kietpawpan.github.io/proofreader/proof.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "proof.png",
+      "src": "https://kietpawpan.github.io/proofreader/proof.png",
       "sizes": "512x512",
       "type": "image/png"
     }
