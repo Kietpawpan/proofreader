@@ -130,6 +130,7 @@
             max-width: 1000px;
             margin: 0 auto;
             color: #212529;
+            position: relative;
         }
 
         .nyt-top-row {
@@ -188,6 +189,15 @@
         .nyt-inline-subheading::after {
             bottom: 0;
         }
+
+        .nyt-footer {
+            text-align: right;
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 30px;
+            padding-top: 10px;
+            font-style: italic;
+        }
         
         .lang-th .nyt-header { font-family: 'Chonburi'; font-size: 65px; }
         .lang-th .nyt-date-line { font-family: 'Sarabun'; font-size: 14px; }
@@ -195,6 +205,8 @@
         .lang-th .nyt-content { font-family: 'Sarabun'; font-size: 18px; }
         .lang-th .nyt-inline-subheading { font-family: 'Pridi'; font-size: 22px; font-weight: 700; }
         .lang-th .nyt-slogan-box { display: none; }
+        .lang-th .nyt-footer { font-family: 'Sarabun'; }
+        .lang-en .nyt-footer { font-family: Lora; }
     </style>
 </head>
 <body>
@@ -247,6 +259,9 @@
         <div class="nyt-content" id="nyt-body">
             <em>Newspaper content will be displayed here...</em>
         </div>
+
+        <!-- ส่วนของ Footer ที่เพิ่มเข้ามา -->
+        <div class="nyt-footer" id="nyt-footer-display"></div>
     </div>
 
     <script>
@@ -335,6 +350,7 @@ async function generateNewspaper(lang) {
     const titleDiv = document.getElementById('nyt-title-display');
     const dateLineDiv = document.querySelector('.nyt-date-line');
     const headerDiv = document.querySelector('.nyt-header');
+    const footerDiv = document.getElementById('nyt-footer-display');
 
     if (!final) {
         alert('Please enter text in the Final box');
@@ -353,6 +369,7 @@ async function generateNewspaper(lang) {
         newspaperDiv.classList.add('lang-th');
         newspaperDiv.classList.remove('lang-en');
         headerDiv.innerText = 'เดอะ สยาม ไทมส์';
+        footerDiv.innerText = 'สื่อจำลองเพื่อการประชาสัมพันธ์--สคพ.11 (นครราชสีมา)';
 
         const englishCharCount = (final.match(/[a-zA-Z]/g) || []).length;
         const isEnglish = englishCharCount > final.length * 0.2;
@@ -386,6 +403,7 @@ async function generateNewspaper(lang) {
         newspaperDiv.classList.add('lang-en');
         newspaperDiv.classList.remove('lang-th');
         headerDiv.innerText = 'The Global Times';
+        footerDiv.innerText = 'Mockup for public relations--EPO11 (Nakhon Ratchasima)';
         
         const thaiCharCount = (final.match(/[\u0E00-\u0E7F]/g) || []).length;
         const isThai = thaiCharCount > final.length * 0.1;
