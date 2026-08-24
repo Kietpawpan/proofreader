@@ -1,0 +1,18 @@
+Please rewrite the following text in the style of the New York Times. You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. 
+
+Paragraph 1 must be the Title. 
+Paragraph 2 must be the Subtitle. 
+Paragraph 3 and onwards must be the Main Content.
+
+Original Text:
+[วางข้อความต้นฉบับของคุณที่นี่]
+
+------------------------
+ช่วยเรียบเรียงข้อความต่อไปนี้ใหม่ให้ออกมาในสำนวนของหนังสือพิมพ์ไทยทางการ โดยคุณต้องจัดรูปแบบผลลัพธ์ตามนี้อย่างเคร่งครัดและห้ามใส่คำกำกับเช่น 'พาดหัวข่าว:' หรือ 'หัวข้อย่อย:' เด็ดขาด
+
+ย่อหน้าที่ 1 ต้องเป็นพาดหัวข่าวหลัก
+ย่อหน้าที่ 2 ต้องเป็นพาดหัวรอง
+ย่อหน้าที่ 3 เป็นต้นไปให้เป็นเนื้อหาข่าวหลัก
+
+ข้อความต้นฉบับ:
+[วางข้อความต้นฉบับของคุณที่นี่]
