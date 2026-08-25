@@ -2,8 +2,8 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
-    <title>Professional Proofreader App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Proofreader</title>
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -20,6 +20,7 @@
             font-family: Lora; 
             background: #e9ecef; 
             padding: 20px; 
+            margin: 0;
             color: #212529;
         }
         h2 { 
@@ -27,6 +28,39 @@
             color: #343a40; 
             font-family: 'Playfair Display';
         }
+        
+        /* Loader Styles */
+        .loader-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: none; /* ซ่อนเป็นค่าเริ่มต้น */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+        .spinner {
+            border: 6px solid #e9ecef;
+            border-top: 6px solid #6f42c1;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        .loader-text { 
+            margin-top: 20px; 
+            font-weight: bold; 
+            font-family: 'Sarabun', sans-serif; 
+            color: #495057;
+            font-size: 18px;
+        }
+
         .container { 
             display: flex; 
             gap: 20px; 
@@ -38,7 +72,7 @@
             flex-direction: column; 
         }
         label {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             margin-bottom: 8px;
             color: #495057;
@@ -68,24 +102,24 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px #0000001a;
         }
-        .ai-controls select {
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 6px;
-            border: 1px solid #ced4da;
-            font-family: Lora;
+        .control-group {
+            display: flex;
+            flex-direction: column;
         }
-        .ai-controls input[type="file"] {
-            padding: 7px;
+        .ai-controls select, .ai-controls input[type="file"] {
+            padding: 8px 10px;
             font-size: 15px;
             border-radius: 6px;
             border: 1px solid #ced4da;
             font-family: Lora;
             background: #f8f9fa;
         }
+        
         .btn-ai {
             background: #6f42c1;
             padding: 10px 20px;
+            align-self: flex-end;
+            margin-top: 15px; /* สำหรับกรณีห่อบรรทัด */
         }
         .btn-ai:hover {
             background: #59339d;
@@ -167,26 +201,23 @@
         .nyt-date-line { font-family: Lora; font-size: 12px; text-transform: uppercase; display: flex; justify-content: space-between; border-top: 1px solid #212529; border-bottom: 2px solid #212529; padding: 8px 0; margin-bottom: 35px; font-weight: bold; letter-spacing: 1px; }
         .nyt-title { font-family: 'Playfair Display'; font-size: 52px; font-weight: 900; line-height: 1.1; text-align: left; margin-top: 0; margin-bottom: 20px; }
         
-        /* สไตล์สำหรับรูปภาพที่อยู่ในคอลัมน์ (ไม่มีกรอบ) */
         .nyt-image-container {
             margin: 5px 0 15px 0;
             text-align: center;
             break-inside: avoid;
             width: 100%;
         }
+
         .nyt-image {
             max-width: 100%;
             height: auto;
-            /* ลบ border และ padding ออก */
-            filter: grayscale(100%) contrast(140%) sepia(20%);
-            mix-blend-mode: multiply;
             box-sizing: border-box;
+            /* Filter and Border are now applied dynamically via inline JS */
         }
         
-        /* สไตล์สำหรับคำบรรยายใต้ภาพ */
         .nyt-image-caption {
             text-align: left;
-            font-size: 13px; /* เล็กกว่าเนื้อหาหลักที่ 16px */
+            font-size: 13px;
             margin-top: 8px;
             color: #495057;
             font-family: inherit;
@@ -230,23 +261,49 @@
             font-style: italic;
         }
         
-        .lang-th .nyt-header { font-family: 'Chonburi'; font-size: 65px; }
+        .lang-th .nyt-header { font-family: 'Chonburi'; font-size: 55px; }
         .lang-th .nyt-date-line { font-family: 'Sarabun'; font-size: 14px; }
-        .lang-th .nyt-title { font-family: 'Pridi'; }
+        .lang-th .nyt-title { font-family: 'Pridi'; font-size: 44px;}
         .lang-th .nyt-content { font-family: 'Sarabun'; font-size: 18px; }
-        .lang-th .nyt-image-caption { font-size: 16px; /* เล็กกว่าเนื้อหาหลักที่ 18px */ font-family: 'Sarabun'; }
+        .lang-th .nyt-image-caption { font-size: 16px; font-family: 'Sarabun'; }
         .lang-th .nyt-inline-subheading { font-family: 'Pridi'; font-size: 22px; font-weight: 700; }
         .lang-th .nyt-slogan-box { display: none; }
         .lang-th .nyt-footer { font-family: 'Sarabun'; }
         .lang-en .nyt-footer { font-family: Lora; }
+
+        /* Media Queries สำหรับหน้าจอมือถือ */
+        @media screen and (max-width: 768px) {
+            .container { flex-direction: column; }
+            .ai-controls { align-items: stretch; padding: 20px; }
+            .control-group { width: 100%; margin-bottom: 5px;}
+            .btn-ai { width: 100%; margin-top: 10px; }
+            .btn-group { flex-direction: column; width: 100%; }
+            .btn-group button { width: 100%; }
+            
+            .newspaper-container { padding: 20px; }
+            .nyt-content { column-count: 1; text-align: left; }
+            .nyt-content p { text-indent: 1.5em; }
+            .nyt-slogan-box { display: none; /* ซ่อน slogan บนมือถือเพื่อให้หัวไม่เบียดกัน */ }
+            .nyt-header { font-size: 45px; }
+            .lang-th .nyt-header { font-size: 40px; }
+            .nyt-title { font-size: 36px; text-align: center; }
+            .lang-th .nyt-title { font-size: 32px; }
+            .nyt-date-line { font-size: 10px; flex-direction: column; align-items: center; gap: 5px; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
-    <h2>Professional Proofreader App</h2>
+    <!-- Loading Overlay -->
+    <div class="loader-overlay" id="global-loader">
+        <div class="spinner"></div>
+        <div class="loader-text" id="loader-text">กำลังประมวลผล...</div>
+    </div>
+
+    <h2>Professional Proofreader</h2>
 
     <div class="ai-controls">
-        <div>
+        <div class="control-group">
             <label for="ai-style">AI Rewrite Style:</label>
             <select id="ai-style">
                 <option value="the New York Times">New York Times</option>
@@ -255,9 +312,25 @@
                 <option value="the King James Bible">King James' Bible</option>
             </select>
         </div>
-        <div>
+        <div class="control-group">
             <label for="image-upload">แทรกรูปภาพ:</label>
             <input type="file" id="image-upload" accept="image/*">
+        </div>
+        <div class="control-group">
+            <label for="img-border">เส้นขอบรูปภาพ:</label>
+            <select id="img-border">
+                <option value="0">0px (ไม่มีเส้นขอบ)</option>
+                <option value="1px solid #212529" selected>1px</option>
+                <option value="2px solid #212529">2px</option>
+                <option value="3px solid #212529">3px</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="img-filter">สไตล์รูปภาพ:</label>
+            <select id="img-filter">
+                <option value="newspaper" selected>ฟิลเตอร์หนังสือพิมพ์เก่า</option>
+                <option value="original">ภาพสีต้นฉบับ</option>
+            </select>
         </div>
         <button class="btn-ai" onclick="rewriteText()">✨ Generate Final Draft</button>
     </div>
@@ -286,7 +359,7 @@
     <div class="newspaper-container lang-en" id="result-newspaper">
         <div class="nyt-top-row">
             <div class="nyt-slogan-box">
-                All the News<br>That's Nice to Write
+                All the News<br>That's Nice to Print
             </div>
             <div class="nyt-header">The Siam Times</div>
         </div>
@@ -303,6 +376,17 @@
 
     <script>
 let uploadedImageSrc = '';
+
+// ควบคุมการแสดงหน้าโหลด
+function showLoader(text) {
+    const loaderText = document.getElementById('loader-text');
+    if(text) loaderText.innerText = text;
+    document.getElementById('global-loader').style.display = 'flex';
+}
+
+function hideLoader() {
+    document.getElementById('global-loader').style.display = 'none';
+}
 
 // โหลดไฟล์รูปภาพเมื่อมีการเลือก
 document.getElementById('image-upload').addEventListener('change', function(e) {
@@ -330,8 +414,8 @@ async function rewriteText() {
     const style = document.getElementById('ai-style').value;
     
     finalBox.value = 'กำลังประมวลผลด้วย AI โปรดรอสักครู่...';
+    showLoader('กำลังให้ AI เขียนเนื้อหาใหม่ โปรดรอสักครู่...');
 
-    // อัปเดต Prompt ให้เขียน Image Caption ที่ย่อหน้า 3
     const instructionPrompt = "You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content. \n\nOriginal Text to rewrite:\n";
     const augmentedDraft = instructionPrompt + draft;
 
@@ -357,6 +441,8 @@ async function rewriteText() {
     } catch (error) {
         finalBox.value = 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์';
         console.error(error);
+    } finally {
+        hideLoader();
     }
 }
 
@@ -396,6 +482,22 @@ function compareTexts() {
     resultDiv.appendChild(fragment);
 }
 
+// ฟังก์ชันสร้าง style สำหรับรูปภาพจากตัวเลือก
+function getDynamicImageStyle() {
+    const borderVal = document.getElementById('img-border').value;
+    const filterVal = document.getElementById('img-filter').value;
+    
+    let css = `border: ${borderVal === '0' ? 'none' : borderVal}; `;
+    
+    if (filterVal === 'newspaper') {
+        css += `filter: grayscale(100%) contrast(140%) sepia(20%); mix-blend-mode: multiply;`;
+    } else {
+        css += `filter: none; mix-blend-mode: normal;`;
+    }
+    
+    return css;
+}
+
 async function generateNewspaper(lang) {
     const final = document.getElementById('final').value;
     const resultDiv = document.getElementById('result-proofread');
@@ -419,21 +521,26 @@ async function generateNewspaper(lang) {
     
     const currentStyle = document.getElementById('ai-style').value;
 
+    const thaiCharCount = (final.match(/[\u0E00-\u0E7F]/g) || []).length;
+    const engCharCount = (final.match(/[a-zA-Z]/g) || []).length;
+
+    let needsTranslation = false;
+
     if (lang === 'th') {
         newspaperDiv.classList.add('lang-th');
         newspaperDiv.classList.remove('lang-en');
         headerDiv.innerText = 'เดอะ สยาม ไทมส์';
-        footerDiv.innerText = 'สื่อจำลองเพื่อการประชาสัมพันธ์—สคพ.11 (นครราชสีมา)';
+        footerDiv.innerText = 'สื่อจำลองเพื่อการประชาสัมพันธ์ — สคพ.11 (นครราชสีมา)';
 
-        const englishCharCount = (final.match(/[a-zA-Z]/g) || []).length;
-        const isEnglish = englishCharCount > final.length * 0.2;
-
+        const isEnglish = engCharCount > thaiCharCount;
         if (isEnglish) {
-            titleDiv.innerText = 'กำลังประมวลผล...';
-            contentDiv.innerHTML = '<p>กำลังแปลภาษาเป็นไทย โปรดรอสักครู่...</p>';
+            needsTranslation = true;
+            titleDiv.innerText = 'กำลังแปลภาษา...';
+            contentDiv.innerHTML = '<p>กำลังแปลเนื้อหา... โปรดรอสักครู่</p>';
             
-            // อัปเดต Prompt
-            const translatePrompt = "Translate the following text to Thai. You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
+            showLoader('กำลังให้ AI แปลเนื้อหาเป็นภาษาไทย โปรดรอสักครู่...');
+            
+            const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO THAI. Ensure the output is entirely in Thai. You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
             
             try {
                 const response = await fetch(scriptUrl, {
@@ -445,12 +552,11 @@ async function generateNewspaper(lang) {
                     })
                 });
                 const data = await response.json();
-                if (data.result) {
-                    processedText = data.result;
-                }
+                if (data.result) processedText = data.result;
             } catch (error) {
                 console.error(error);
-                contentDiv.innerHTML = '<p>เกิดข้อผิดพลาดในการแปลภาษา</p>';
+                contentDiv.innerHTML = '<p>เกิดข้อผิดพลาดในการแปลภาษา ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้</p>';
+                hideLoader();
                 return;
             }
         }
@@ -458,17 +564,17 @@ async function generateNewspaper(lang) {
         newspaperDiv.classList.add('lang-en');
         newspaperDiv.classList.remove('lang-th');
         headerDiv.innerText = 'The Siam Times';
-        footerDiv.innerText = 'Mockup for public relations—EPO11 (Nakhon Ratchasima)';
+        footerDiv.innerText = 'Mockup for public relations — EPO11 (Nakhon Ratchasima)';
         
-        const thaiCharCount = (final.match(/[\u0E00-\u0E7F]/g) || []).length;
-        const isThai = thaiCharCount > final.length * 0.1;
-
+        const isThai = thaiCharCount > engCharCount;
         if (isThai) {
-            titleDiv.innerText = 'Processing...';
-            contentDiv.innerHTML = '<p>Translating to English. Please wait...</p>';
+            needsTranslation = true;
+            titleDiv.innerText = 'Translating...';
+            contentDiv.innerHTML = '<p>Translating content... Please wait.</p>';
             
-            // อัปเดต Prompt
-            const translatePrompt = "Translate the following text to English in the style of " + currentStyle + ". You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
+            showLoader('Translating to English via AI. Please wait...');
+            
+            const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO ENGLISH. Ensure the output is entirely in English. Adapt the tone to the style of " + currentStyle + ". You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
             
             try {
                 const response = await fetch(scriptUrl, {
@@ -480,16 +586,17 @@ async function generateNewspaper(lang) {
                     })
                 });
                 const data = await response.json();
-                if (data.result) {
-                    processedText = data.result;
-                }
+                if (data.result) processedText = data.result;
             } catch (error) {
                 console.error(error);
-                contentDiv.innerHTML = '<p>Error translating text.</p>';
+                contentDiv.innerHTML = '<p>Error translating text. Could not connect to the server.</p>';
+                hideLoader();
                 return;
             }
         }
     }
+
+    if(needsTranslation) hideLoader();
 
     const paragraphs = processedText.split(/\n+/).filter(p => p.trim() !== '');
     
@@ -499,6 +606,9 @@ async function generateNewspaper(lang) {
 
     let newContentHTML = '';
     const noContentMsg = lang === 'th' ? 'ไม่มีเนื้อหาเพิ่มเติม' : 'No additional content provided.';
+    
+    // ดึงสไตล์ของรูปที่ประมวลผลมา
+    const imgStyleCss = getDynamicImageStyle();
 
     if (paragraphs.length >= 2) {
         newContentHTML += `<div class="nyt-inline-subheading">${paragraphs[1]}</div>`;
@@ -506,20 +616,18 @@ async function generateNewspaper(lang) {
         let imageCaption = '';
         let bodyPars = [];
 
-        // ถ้ามีการอัปโหลดรูป ให้ดึงย่อหน้าที่ 3 (index 2) มาเป็น Caption
         if (uploadedImageSrc) {
             if (paragraphs.length >= 3) {
                 imageCaption = paragraphs[2];
-                bodyPars = paragraphs.slice(3); // เนื้อหาหลักเริ่มที่ย่อหน้าที่ 4
+                bodyPars = paragraphs.slice(3); 
             }
             
             newContentHTML += `
             <div class="nyt-image-container">
-                <img class="nyt-image" src="${uploadedImageSrc}" alt="Newspaper Image">
+                <img class="nyt-image" src="${uploadedImageSrc}" alt="Newspaper Image" style="${imgStyleCss}">
                 ${imageCaption ? `<div class="nyt-image-caption">${imageCaption}</div>` : ''}
             </div>`;
         } else {
-            // ถ้าไม่อัปโหลดรูป ก็เอาเนื้อหาตั้งแต่ย่อหน้าที่ 3 (index 2) ไปแสดงเป็นเนื้อหาตามปกติ ป้องกันข้อความหาย
             bodyPars = paragraphs.slice(2);
         }
 
@@ -532,7 +640,7 @@ async function generateNewspaper(lang) {
         if (uploadedImageSrc) {
             newContentHTML += `
             <div class="nyt-image-container">
-                <img class="nyt-image" src="${uploadedImageSrc}" alt="Newspaper Image">
+                <img class="nyt-image" src="${uploadedImageSrc}" alt="Newspaper Image" style="${imgStyleCss}">
             </div>`;
         }
         newContentHTML += `<p>${noContentMsg}</p>`;
@@ -540,6 +648,7 @@ async function generateNewspaper(lang) {
 
     contentDiv.innerHTML = newContentHTML;
 
+    // การคำนวณและสร้างวันที่
     const now = new Date();
     const hour = now.getHours();
     const dateNum = now.getDate();
