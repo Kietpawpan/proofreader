@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Proof">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://kietpawpan.github.io/proofreader/proof.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://kietpawpan.github.io/hotspot/img/App.png">
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a148c">
@@ -184,20 +184,28 @@
             margin-bottom: 10px;
         }
         
-        .nyt-slogan-box {
-            position: absolute;
-            left: 0;
-            border: 1px solid #212529;
-            padding: 6px 10px;
-            font-family: Lora;
-            font-size: 11px;
-            text-align: center;
-            font-style: italic;
-            font-weight: bold;
-            line-height: 1.4;
-        }
+       @font-face {
+    font-family: 'Chomsky';
+    src: url('chomsky.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
 
-        .nyt-header { text-align: center; font-family: 'UnifrakturMaguntia'; font-size: 70px; color: #212529; line-height: 1; }
+.nyt-slogan-box {
+    position: absolute;
+    left: 0;
+    border: 1px solid #212529;
+    padding: 16px 20px;
+    font-family: Lora, 'Chomsky';
+    font-size: 11px;
+    text-align: center;
+    font-style: normal;
+    font-weight: bold;
+    line-height: 1.4;
+}
+
+
+        .nyt-header { text-align: center; font-family: 'Chomsky'/*'UnifrakturMaguntia'*/; font-size: 70px; color: #212529; line-height: 1; }
         .nyt-date-line { font-family: Lora; font-size: 12px; text-transform: uppercase; display: flex; justify-content: space-between; border-top: 1px solid #212529; border-bottom: 2px solid #212529; padding: 8px 0; margin-bottom: 35px; font-weight: bold; letter-spacing: 1px; }
         .nyt-title { font-family: 'Playfair Display'; font-size: 52px; font-weight: 900; line-height: 1.1; text-align: left; margin-top: 0; margin-bottom: 20px; }
         
@@ -359,7 +367,7 @@
     <div class="newspaper-container lang-en" id="result-newspaper">
         <div class="nyt-top-row">
             <div class="nyt-slogan-box">
-                All the News<br>That's Nice to Print
+                "All the News<br>That's Nice to Print"
             </div>
             <div class="nyt-header">The Siam Times</div>
         </div>
@@ -698,7 +706,7 @@ async function generateNewspaper(lang) {
         while (volNum >= 1) { volRoman += 'I'; volNum -= 1; }
 
         const span1 = '<span>VOL. ' + volRoman + '... No. ' + issueNo + '</span>';
-        const span2 = '<span>BANGKOK ' + dName + ' ' + mName + ' ' + dateNum + ' ' + year + '</span>';
+        const span2 = '<span>BANGKOK, ' + dName + ', ' + mName + ' ' + dateNum + ', ' + year + '</span>';
         const span3 = '<span>$3.00</span>';
         
         dateHTML = span1 + span2 + span3;
