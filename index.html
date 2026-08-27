@@ -780,6 +780,79 @@ function copyFinalText() {
     });
 }
 
+// ฟังก์ชันสำหรับ Double Click ที่หน้าหนังสือพิมพ์เพื่อคัดลอก HTML
+document.getElementById('result-newspaper').addEventListener('dblclick', function(e) {
+    // 1. ป้องกันการก๊อปปี้หากผู้ใช้แค่ดับเบิลคลิกเพื่อคลุมดำ (Select Text) เลือกคำ
+    if (window.getSelection().toString().length > 0) return;
+
+    // 2. ดึงโค้ด CSS ของแอปพลิเคชันที่มีอยู่
+    const styles = document.querySelector('style').innerHTML;
+    
+    // 3. ดึงลิงก์ฟอนต์ที่จำเป็นทั้งหมด
+    const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
+    
+    // 4. คัดลอกโครงสร้าง HTML ของหนังสือพิมพ์ปัจจุบัน
+    const newspaperNode = this.cloneNode(true);
+    newspaperNode.style.display = 'block'; // บังคับให้แสดงผล (กันติดค่า display: none)
+    newspaperNode.style.margin = '40px auto'; // จัดให้อยู่กึ่งกลางหน้าจอเสมอเวลาเปิดไฟล์ใหม่
+
+    // 5. ประกอบร่างเป็นโค้ด HTML แบบเต็มไฟล์ (Full HTML Document)
+    const htmlContent = `<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Siam Times - Exported</title>
+    ${fonts}
+    <style>
+        ${styles}
+        /* เพิ่มพื้นหลังสีเทาให้ไฟล์ใหม่ดูเหมือนแอปต้นฉบับ */
+        body { background: #e9ecef; margin: 0; padding: 20px; }
+    </style>
+</head>
+<body>
+    ${newspaperNode.outerHTML}
+</body>
+</html>`;
+
+    // 6. ใช้ Clipboard API บันทึกโค้ดทั้งหมดลงในคลิปบอร์ด
+    navigator.clipboard.writeText(htmlContent).then(() => {
+        // สร้าง Popup เล็กๆ แจ้งเตือนแบบสวยงาม (Toast Notification)
+        const toast = document.createElement('div');
+        toast.innerHTML = '✅ <b>Copied!</b><br>คัดลอกโค้ด HTML เรียบร้อย<br><span style="font-size:12px; font-weight:normal;">สามารถนำไปวางในไฟล์ .html ใหม่ได้เลย</span>';
+        Object.assign(toast.style, {
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            background: '#212529',
+            color: 'white',
+            padding: '15px 20px',
+            borderRadius: '8px',
+            boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
+            fontFamily: 'Sarabun, sans-serif',
+            zIndex: '9999',
+            opacity: '0',
+            transition: 'opacity 0.3s ease-in-out',
+            textAlign: 'center',
+            lineHeight: '1.4'
+        });
+        document.body.appendChild(toast);
+        
+        // แสดง Popup
+        setTimeout(() => toast.style.opacity = '1', 10);
+        
+        // ซ่อนและลบ Popup ออกหลังจาก 3.5 วินาที
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
+        
+    }).catch(err => {
+        console.error('Copy failed:', err);
+        alert('เกิดข้อผิดพลาดในการคัดลอกโค้ด HTML ครับ');
+    });
+});
+
     </script>
 
 </body>
