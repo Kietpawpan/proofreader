@@ -297,6 +297,33 @@
             .lang-th .nyt-title { font-size: 32px; }
             .nyt-date-line { font-size: 10px; flex-direction: column; align-items: center; gap: 5px; text-align: center; }
         }
+
+/* สไตล์สำหรับส่วนหัวของกล่องข้อความ และปุ่ม Copy */
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .box-header label {
+            margin-bottom: 0; /* ยกเลิก margin-bottom เดิมเพื่อให้ตรงกับปุ่ม */
+        }
+        .btn-copy {
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            background: #198754; /* สีเขียว */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px #0000001a;
+        }
+        .btn-copy:hover {
+            background: #157347;
+        }
+
     </style>
 </head>
 <body>
@@ -347,11 +374,18 @@
             <label for="draft">Draft</label>
             <textarea id="draft" placeholder="Paste draft text here..."></textarea>
         </div>
-        <div class="box">
-            <label for="final">Final</label>
+
+
+<div class="box">
+            <div class="box-header">
+                <label for="final">Final</label>
+                <button class="btn-copy" id="copyBtn" onclick="copyFinalText()">📋 Copy</button>
+            </div>
             <textarea id="final" placeholder="Paste final text here..."></textarea>
         </div>
-    </div>
+
+        </div>
+   
     
     <div class="btn-group">
         <button class="btn-proofread" onclick="compareTexts()">Show Proofread Marks</button>
@@ -717,6 +751,35 @@ if (lang === 'th') {
 
     dateLineDiv.innerHTML = dateHTML;
 }
+
+// ฟังก์ชันคัดลอกข้อความจากกล่อง Final
+function copyFinalText() {
+    const finalBox = document.getElementById('final');
+    const copyBtn = document.getElementById('copyBtn');
+    
+    if (!finalBox.value.trim()) {
+        alert('ไม่มีข้อความให้คัดลอกครับ');
+        return;
+    }
+
+    // ใช้ Clipboard API เพื่อคัดลอกข้อความ
+    navigator.clipboard.writeText(finalBox.value).then(() => {
+        // เปลี่ยนข้อความและสีปุ่มชั่วคราวเพื่อแสดงว่าคัดลอกสำเร็จ
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '✅ Copied!';
+        copyBtn.style.background = '#0dcaf0'; // เปลี่ยนเป็นสีฟ้า
+        
+        // คืนค่าปุ่มกลับเป็นเหมือนเดิมหลังจาก 2 วินาที
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.background = '#198754';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        alert('เกิดข้อผิดพลาด ไม่สามารถคัดลอกได้ครับ');
+    });
+}
+
     </script>
 
 </body>
