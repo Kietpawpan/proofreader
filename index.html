@@ -260,7 +260,7 @@
         .nyt-inline-subheading::after { bottom: 0; }
 
         .nyt-footer {
-            text-align: right;
+            text-align: left;
             font-size: 11px;
             color: #6c757d;
             margin-top: 30px;
@@ -533,11 +533,12 @@ async function generateNewspaper(lang) {
 
     let needsTranslation = false;
 
-    if (lang === 'th') {
+if (lang === 'th') {
         newspaperDiv.classList.add('lang-th');
         newspaperDiv.classList.remove('lang-en');
         headerDiv.innerText = 'เดอะ สยาม ไทมส์';
-        footerDiv.innerText = 'สื่อจำลองเพื่อการประชาสัมพันธ์ — สคพ.11 (นครราชสีมา)';
+        // เปลี่ยนบรรทัดด้านล่างนี้
+        footerDiv.innerText = '© 2569 The Siam Times สงวนลิขสิทธิ์ ไม่อนุญาตให้นำรูปแบบการจัดหน้า โลโก้ หรือองค์ประกอบของแบรนด์ไปดัดแปลงหรือใช้ในเชิงพาณิชย์ ภาพประกอบและข้อมูลอ้างอิงเป็นลิขสิทธิ์ของแหล่งที่มาตามที่ระบุไว้ในเนื้อหา';
 
         const isEnglish = engCharCount > thaiCharCount;
         if (isEnglish) {
@@ -567,11 +568,14 @@ async function generateNewspaper(lang) {
                 return;
             }
         }
-    } else {
+
+} else {
         newspaperDiv.classList.add('lang-en');
         newspaperDiv.classList.remove('lang-th');
         headerDiv.innerText = 'The Siam Times';
-        footerDiv.innerText = 'Mockup for public relations — EPO11 (Nakhon Ratchasima)';
+        // เปลี่ยนบรรทัดด้านล่างนี้
+        footerDiv.innerText = '© 2026 The Siam Times. All rights reserved. Modification or commercial use of the page layout, logos, or brand elements is strictly prohibited without prior permission. Images and referenced information remain the copyright of their respective sources as credited within the content.';
+       
         
         const isThai = thaiCharCount > engCharCount;
         if (isThai) {
