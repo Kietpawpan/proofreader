@@ -219,7 +219,6 @@
             max-width: 100%;
             height: auto;
             box-sizing: border-box;
-            /* Filter and Border are now applied dynamically via inline JS */
         }
         
         .nyt-image-caption {
@@ -290,7 +289,7 @@
             .newspaper-container { padding: 20px; }
             .nyt-content { column-count: 1; text-align: left; }
             .nyt-content p { text-indent: 1.5em; }
-            .nyt-slogan-box { display: none; /* ซ่อน slogan บนมือถือเพื่อให้หัวไม่เบียดกัน */ }
+            .nyt-slogan-box { display: none; }
             .nyt-header { font-size: 45px; }
             .lang-th .nyt-header { font-size: 40px; }
             .nyt-title { font-size: 36px; text-align: center; }
@@ -298,7 +297,7 @@
             .nyt-date-line { font-size: 10px; flex-direction: column; align-items: center; gap: 5px; text-align: center; }
         }
 
-/* สไตล์สำหรับส่วนหัวของกล่องข้อความ และปุ่ม Copy */
+        /* สไตล์สำหรับส่วนหัวของกล่องข้อความ และปุ่มต่างๆ */
         .box-header {
             display: flex;
             justify-content: space-between;
@@ -306,13 +305,17 @@
             margin-bottom: 8px;
         }
         .box-header label {
-            margin-bottom: 0; /* ยกเลิก margin-bottom เดิมเพื่อให้ตรงกับปุ่ม */
+            margin-bottom: 0;
+        }
+        .btn-action-group {
+            display: flex;
+            gap: 6px;
         }
         .btn-copy {
             padding: 5px 12px;
             font-size: 13px;
             font-weight: bold;
-            background: #198754; /* สีเขียว */
+            background: #198754;
             color: white;
             border: none;
             border-radius: 6px;
@@ -322,6 +325,21 @@
         }
         .btn-copy:hover {
             background: #157347;
+        }
+        .btn-clear {
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            background: #dc3545; /* สีแดงสำหรับปุ่มล้างข้อมูล */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px #0000001a;
+        }
+        .btn-clear:hover {
+            background: #bb2d3b;
         }
 
     </style>
@@ -370,21 +388,34 @@
     </div>
 
     <div class="container">
+        <!-- ช่อง Draft พร้อมปุ่มล้างข้อมูล -->
         <div class="box">
-            <label for="draft">Draft</label>
+            <div class="box-header">
+                <label for="draft">Draft</label>
+
+
+<!-- สำหรับช่อง Draft -->
+<button type="button" class="btn-clear" onclick="clearDraftText()">🗑️ ล้างข้อมูล</button>
+
+            </div>
             <textarea id="draft" placeholder="Paste draft text here..."></textarea>
         </div>
 
-
-<div class="box">
+        <!-- ช่อง Final พร้อมปุ่มล้างข้อมูลและปุ่มคัดลอก -->
+        <div class="box">
             <div class="box-header">
                 <label for="final">Final</label>
-                <button class="btn-copy" id="copyBtn" onclick="copyFinalText()">📋 Copy</button>
+                <div class="btn-action-group">
+           
+<!-- สำหรับช่อง Final -->
+<button type="button" class="btn-clear" onclick="clearFinalText()">🗑️ ล้างข้อมูล</button>
+
+                    <button class="btn-copy" id="copyBtn" onclick="copyFinalText()">📋 Copy</button>
+                </div>
             </div>
             <textarea id="final" placeholder="Paste final text here..."></textarea>
         </div>
-
-        </div>
+    </div>
    
     
     <div class="btn-group">
@@ -427,6 +458,35 @@ function showLoader(text) {
 
 function hideLoader() {
     document.getElementById('global-loader').style.display = 'none';
+}
+
+
+function clearDraftText() {
+    const draftBox = document.getElementById('draft');
+    if (!draftBox.value.trim()) {
+        alert('ช่อง Draft ว่างอยู่แล้วครับ');
+        return;
+    }
+    if (confirm('ต้องการล้างข้อมูลในช่อง Draft ใช่หรือไม่?')) {
+        draftBox.value = '';
+        // เพิ่มคำสั่งซ่อนกล่องผลลัพธ์เมื่อกดล้างข้อมูล
+        document.getElementById('result-proofread').style.display = 'none';
+        document.getElementById('result-newspaper').style.display = 'none';
+    }
+}
+
+function clearFinalText() {
+    const finalBox = document.getElementById('final');
+    if (!finalBox.value.trim()) {
+        alert('ช่อง Final ว่างอยู่แล้วครับ');
+        return;
+    }
+    if (confirm('ต้องการล้างข้อมูลในช่อง Final ใช่หรือไม่?')) {
+        finalBox.value = '';
+        // เพิ่มคำสั่งซ่อนกล่องผลลัพธ์เมื่อกดล้างข้อมูล
+        document.getElementById('result-proofread').style.display = 'none';
+        document.getElementById('result-newspaper').style.display = 'none';
+    }
 }
 
 // โหลดไฟล์รูปภาพเมื่อมีการเลือก
@@ -571,7 +631,6 @@ if (lang === 'th') {
         newspaperDiv.classList.add('lang-th');
         newspaperDiv.classList.remove('lang-en');
         headerDiv.innerText = 'เดอะ สยาม ไทมส์';
-        // เปลี่ยนบรรทัดด้านล่างนี้
         footerDiv.innerText = '© 2569 The Siam Times สงวนลิขสิทธิ์ ไม่อนุญาตให้นำรูปแบบการจัดหน้า โลโก้ หรือองค์ประกอบของแบรนด์ไปดัดแปลงหรือใช้ในเชิงพาณิชย์ ภาพประกอบและข้อมูลอ้างอิงเป็นลิขสิทธิ์ของแหล่งที่มาตามที่ระบุไว้ในเนื้อหา';
 
         const isEnglish = engCharCount > thaiCharCount;
@@ -607,10 +666,8 @@ if (lang === 'th') {
         newspaperDiv.classList.add('lang-en');
         newspaperDiv.classList.remove('lang-th');
         headerDiv.innerText = 'The Siam Times';
-        // เปลี่ยนบรรทัดด้านล่างนี้
         footerDiv.innerText = '© 2026 The Siam Times. All rights reserved. Modification or commercial use of the page layout, logos, or brand elements is strictly prohibited without prior permission. Images and referenced information remain the copyright of their respective sources as credited within the content.';
        
-        
         const isThai = thaiCharCount > engCharCount;
         if (isThai) {
             needsTranslation = true;
@@ -652,7 +709,6 @@ if (lang === 'th') {
     let newContentHTML = '';
     const noContentMsg = lang === 'th' ? 'ไม่มีเนื้อหาเพิ่มเติม' : 'No additional content provided.';
     
-    // ดึงสไตล์ของรูปที่ประมวลผลมา
     const imgStyleCss = getDynamicImageStyle();
 
     if (paragraphs.length >= 2) {
@@ -693,7 +749,6 @@ if (lang === 'th') {
 
     contentDiv.innerHTML = newContentHTML;
 
-    // การคำนวณและสร้างวันที่
     const now = new Date();
     const hour = now.getHours();
     const dateNum = now.getDate();
@@ -762,14 +817,11 @@ function copyFinalText() {
         return;
     }
 
-    // ใช้ Clipboard API เพื่อคัดลอกข้อความ
     navigator.clipboard.writeText(finalBox.value).then(() => {
-        // เปลี่ยนข้อความและสีปุ่มชั่วคราวเพื่อแสดงว่าคัดลอกสำเร็จ
         const originalText = copyBtn.innerHTML;
         copyBtn.innerHTML = '✅ Copied!';
-        copyBtn.style.background = '#0dcaf0'; // เปลี่ยนเป็นสีฟ้า
+        copyBtn.style.background = '#0dcaf0';
         
-        // คืนค่าปุ่มกลับเป็นเหมือนเดิมหลังจาก 2 วินาที
         setTimeout(() => {
             copyBtn.innerHTML = originalText;
             copyBtn.style.background = '#198754';
@@ -782,21 +834,15 @@ function copyFinalText() {
 
 // ฟังก์ชันสำหรับ Double Click ที่หน้าหนังสือพิมพ์เพื่อคัดลอก HTML
 document.getElementById('result-newspaper').addEventListener('dblclick', function(e) {
-    // 1. ป้องกันการก๊อปปี้หากผู้ใช้แค่ดับเบิลคลิกเพื่อคลุมดำ (Select Text) เลือกคำ
     if (window.getSelection().toString().length > 0) return;
 
-    // 2. ดึงโค้ด CSS ของแอปพลิเคชันที่มีอยู่
     const styles = document.querySelector('style').innerHTML;
-    
-    // 3. ดึงลิงก์ฟอนต์ที่จำเป็นทั้งหมด
     const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
     
-    // 4. คัดลอกโครงสร้าง HTML ของหนังสือพิมพ์ปัจจุบัน
     const newspaperNode = this.cloneNode(true);
-    newspaperNode.style.display = 'block'; // บังคับให้แสดงผล (กันติดค่า display: none)
-    newspaperNode.style.margin = '40px auto'; // จัดให้อยู่กึ่งกลางหน้าจอเสมอเวลาเปิดไฟล์ใหม่
+    newspaperNode.style.display = 'block';
+    newspaperNode.style.margin = '40px auto';
 
-    // 5. ประกอบร่างเป็นโค้ด HTML แบบเต็มไฟล์ (Full HTML Document)
     const htmlContent = `<!DOCTYPE html>
 <html lang="th">
 <head>
@@ -806,7 +852,6 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
     ${fonts}
     <style>
         ${styles}
-        /* เพิ่มพื้นหลังสีเทาให้ไฟล์ใหม่ดูเหมือนแอปต้นฉบับ */
         body { background: #e9ecef; margin: 0; padding: 20px; }
     </style>
 </head>
@@ -815,9 +860,7 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
 </body>
 </html>`;
 
-    // 6. ใช้ Clipboard API บันทึกโค้ดทั้งหมดลงในคลิปบอร์ด
     navigator.clipboard.writeText(htmlContent).then(() => {
-        // สร้าง Popup เล็กๆ แจ้งเตือนแบบสวยงาม (Toast Notification)
         const toast = document.createElement('div');
         toast.innerHTML = '✅ <b>Copied!</b><br>คัดลอกโค้ด HTML เรียบร้อย<br><span style="font-size:12px; font-weight:normal;">สามารถนำไปวางในไฟล์ .html ใหม่ได้เลย</span>';
         Object.assign(toast.style, {
@@ -838,10 +881,8 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
         });
         document.body.appendChild(toast);
         
-        // แสดง Popup
         setTimeout(() => toast.style.opacity = '1', 10);
         
-        // ซ่อนและลบ Popup ออกหลังจาก 3.5 วินาที
         setTimeout(() => {
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 300);
@@ -852,6 +893,14 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
         alert('เกิดข้อผิดพลาดในการคัดลอกโค้ด HTML ครับ');
     });
 });
+
+function clearDraftText() {
+    const draftBox = document.getElementById('draft').value='';
+}
+
+function clearFinalText() {
+    const finalBox = document.getElementById('final').value='';
+}
 
     </script>
 
