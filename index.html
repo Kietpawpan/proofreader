@@ -230,8 +230,16 @@
             font-style: italic;
             line-height: 1.4;
         }
-
-        .nyt-content { font-family: Lora; font-size: 16px; line-height: 1.7; column-count: 3; column-gap: 25px; column-rule: 3px solid #6c757d; text-align: justify; }
+.lang-th .nyt-content { 
+    font-family: 'Sarabun'; 
+    font-size: 18px; 
+    text-align: justify;
+    text-justify: inter-cluster;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+    /*    .nyt-content { font-family: Lora; font-size: 16px; line-height: 1.7; column-count: 3; column-gap: 25px; column-rule: 3px solid #6c757d; text-align: justify; }*/
         .nyt-content p { margin-top: 0; margin-bottom: 1.2em; text-indent: 2em; }
         
         .nyt-inline-subheading {
