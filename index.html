@@ -14,9 +14,7 @@
     <meta name="theme-color" content="#4a148c">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.1.0/diff.min.js"></script>
-    <!--link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet"-->
-    <link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <style>
         body { 
             font-family: Lora; 
@@ -205,25 +203,10 @@
     font-weight: bold;
     line-height: 1.4;
 }
-        
+
         .nyt-header { text-align: center; font-family: 'Chomsky'/*'UnifrakturMaguntia'*/; font-size: 70px; color: #212529; line-height: 1; }
         .nyt-date-line { font-family: Lora; font-size: 12px; text-transform: uppercase; display: flex; justify-content: space-between; border-top: 1px solid #212529; border-bottom: 2px solid #212529; padding: 8px 0; margin-bottom: 35px; font-weight: bold; letter-spacing: 1px; }
-       .nyt-title { font-family: 'Newsreader', serif; font-size: 52px; font-weight: 800; line-height: 1.1; text-align: left; margin-top: 0; margin-bottom: 20px; letter-spacing: -0.02em; }
-        
-        .nyt-content { font-family: 'Newsreader', serif; font-size: 17px; line-height: 1.6; column-count: 3; column-gap: 25px; column-rule: 3px solid #6c757d; text-align: justify; }
-        .nyt-content p { margin-top: 0; margin-bottom: 1.2em; text-indent: 2em; }
-        
-        .nyt-inline-subheading {
-            font-family: 'Newsreader', serif;
-            font-size: 22px;
-            font-weight: 700;
-            text-align: center;
-            padding: 10px 0;
-            margin-bottom: 15px;
-            line-height: 1.4;
-            break-inside: avoid;
-            position: relative;
-        }
+        .nyt-title { font-family: 'Playfair Display'; font-size: 52px; font-weight: 900; line-height: 1.1; text-align: left; margin-top: 0; margin-bottom: 20px; }
         
         .nyt-image-container {
             margin: 5px 0 15px 0;
@@ -248,6 +231,19 @@
             line-height: 1.4;
         }
 
+        .nyt-content { font-family: Lora; font-size: 16px; line-height: 1.7; column-count: 3; column-gap: 25px; column-rule: 3px solid #6c757d; text-align: justify; }
+        .nyt-content p { margin-top: 0; margin-bottom: 1.2em; text-indent: 2em; }
+        
+        .nyt-inline-subheading {
+            font-family: 'Playfair Display';
+            font-size: 20px;
+            text-align: center;
+            padding: 10px 0;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            break-inside: avoid;
+            position: relative;
+        }
         
         .nyt-inline-subheading::before,
         .nyt-inline-subheading::after {
@@ -721,18 +717,9 @@ if (lang === 'th') {
         let imageCaption = '';
         let bodyPars = [];
 
-if (uploadedImageSrc) {
+        if (uploadedImageSrc) {
             if (paragraphs.length >= 3) {
-                let rawCaption = paragraphs[2];
-                
-                // ค้นหาจุดจบประโยคแรก (. ! ?) ที่ตามด้วยช่องว่าง
-                const match = rawCaption.match(/^([^.!?]+[.!?]+)\s+(.*)$/);
-                if (match) {
-                    imageCaption = `${match[1]} ${match[2]}`;
-                } else {
-                    imageCaption = rawCaption;
-                }
-                
+                imageCaption = paragraphs[2];
                 bodyPars = paragraphs.slice(3); 
             }
             
@@ -845,120 +832,75 @@ function copyFinalText() {
     });
 }
 
-// ฟังก์ชันสำหรับ Double Click ที่หน้าหนังสือพิมพ์เพื่อคัดลอกทั้งโค้ดและรูปแบบ
+// ฟังก์ชันสำหรับ Double Click ที่หน้าหนังสือพิมพ์เพื่อคัดลอก HTML
 document.getElementById('result-newspaper').addEventListener('dblclick', function(e) {
-    window.getSelection().removeAllRanges();
-    const newspaperNode = this;
+    if (window.getSelection().toString().length > 0) return;
 
-    let styles = document.querySelector('style').innerHTML;
-    try {
-        const fontUrl = new URL('Chomsky.woff2', window.location.href).href;
-        styles = styles.replace(/url\(['"]?Chomsky\.woff2['"]?\)/g, `url('${fontUrl}')`);
-    } catch (err) {
-        console.warn('URL parsing failed');
-    }
-
-    const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
+    const styles = document.querySelector('style').innerHTML;
+    const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
+    
+    const newspaperNode = this.cloneNode(true);
+    newspaperNode.style.display = 'block';
+    newspaperNode.style.margin = '40px auto';
 
     const htmlContent = `<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Siam Times</title>
     ${fonts}
     <style>
         ${styles}
-        body { background: #ffffff; margin: 0; padding: 20px; }
+        body { background: #e9ecef; margin: 0; padding: 20px; }
     </style>
 </head>
 <body>
-    ${newspaperNode.cloneNode(true).outerHTML}
+    ${newspaperNode.outerHTML}
 </body>
 </html>`;
 
-    // 1. ให้โหมดสำรองทำงานก่อนแบบทันทีเพื่อไม่ให้เสียสิทธิ User Gesture จากเบราว์เซอร์
-    let fallbackSuccess = false;
-    try {
-        const tempStyle = document.createElement('style');
-        tempStyle.innerHTML = styles;
-        newspaperNode.prepend(tempStyle);
-
-        const range = document.createRange();
-        range.selectNode(newspaperNode);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-        fallbackSuccess = document.execCommand('copy');
-
-        selection.removeAllRanges();
-        newspaperNode.removeChild(tempStyle);
-    } catch (err) {
-        console.warn('Fallback copy failed');
-    }
-
-    // 2. ใช้ Clipboard API รุ่นใหม่คัดลอกโค้ดเต็มทับลงไป
-    if (navigator.clipboard && window.ClipboardItem) {
-        const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
-        const textBlob = new Blob([htmlContent], { type: 'text/plain' });
-        const clipboardItem = new ClipboardItem({
-            'text/html': htmlBlob,
-            'text/plain': textBlob
-        });
-
-        navigator.clipboard.write([clipboardItem]).then(() => {
-            showCopyToast();
-        }).catch((err) => {
-            if (fallbackSuccess) {
-                showCopyToast();
-            } else {
-                fallbackRawCopy();
-            }
-        });
-    } else {
-        if (fallbackSuccess) {
-            showCopyToast();
-        } else {
-            fallbackRawCopy();
-        }
-    }
-
-    function fallbackRawCopy() {
-        try {
-            const textArea = document.createElement("textarea");
-            textArea.value = htmlContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            alert('คัดลอกสำเร็จเฉพาะโค้ด HTML (เนื่องจากข้อจำกัดของเบราว์เซอร์)');
-        } catch(e) {
-            alert('เบราว์เซอร์ของคุณไม่รองรับการคัดลอกอัตโนมัติ');
-        }
-    }
-
-    function showCopyToast() {
+    navigator.clipboard.writeText(htmlContent).then(() => {
         const toast = document.createElement('div');
-        toast.innerHTML = '✅ <b>Copied!</b><br>คัดลอกรูปแบบหนังสือพิมพ์เรียบร้อย<br><span style="font-size:12px; font-weight:normal;">นำไปวางในโปรแกรม Word หรือ Email ได้เลย</span>';
+        toast.innerHTML = '✅ <b>Copied!</b><br>คัดลอกโค้ด HTML เรียบร้อย<br><span style="font-size:12px; font-weight:normal;">สามารถนำไปวางในไฟล์ .html ใหม่ได้เลย</span>';
         Object.assign(toast.style, {
-            position: 'fixed', bottom: '30px', right: '30px',
-            background: '#212529', color: 'white', padding: '15px 20px',
-            borderRadius: '8px', boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
-            fontFamily: 'Sarabun, sans-serif', zIndex: '9999',
-            opacity: '0', transition: 'opacity 0.3s ease-in-out',
-            textAlign: 'center', lineHeight: '1.4'
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            background: '#212529',
+            color: 'white',
+            padding: '15px 20px',
+            borderRadius: '8px',
+            boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
+            fontFamily: 'Sarabun, sans-serif',
+            zIndex: '9999',
+            opacity: '0',
+            transition: 'opacity 0.3s ease-in-out',
+            textAlign: 'center',
+            lineHeight: '1.4'
         });
         document.body.appendChild(toast);
+        
         setTimeout(() => toast.style.opacity = '1', 10);
+        
         setTimeout(() => {
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 300);
         }, 3500);
-    }
+        
+    }).catch(err => {
+        console.error('Copy failed:', err);
+        alert('เกิดข้อผิดพลาดในการคัดลอกโค้ด HTML ครับ');
+    });
 });
-</script>
 
-</body>
-</html>
+function clearDraftText() {
+    const draftBox = document.getElementById('draft').value='';
+}
+
+function clearFinalText() {
+    const finalBox = document.getElementById('final').value='';
+}
 
     </script>
 
