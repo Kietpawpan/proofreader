@@ -635,7 +635,7 @@ if (lang === 'th') {
         newspaperDiv.classList.add('lang-th');
         newspaperDiv.classList.remove('lang-en');
         headerDiv.innerText = 'เดอะ สยาม ไทมส์';
-        footerDiv.innerText = '© 2569 The Siam Times สงวนลิขสิทธิ์';
+        footerDiv.innerText = '© 2569 The Siam Times สงวนลิขสิทธิ์ ไม่อนุญาตให้นำรูปแบบการจัดหน้า โลโก้ หรือองค์ประกอบของแบรนด์ไปดัดแปลงหรือใช้ในเชิงพาณิชย์ ภาพประกอบและข้อมูลอ้างอิงเป็นลิขสิทธิ์ของแหล่งที่มาตามที่ระบุไว้ในเนื้อหา';
 
         const isEnglish = engCharCount > thaiCharCount;
         if (isEnglish) {
@@ -670,7 +670,7 @@ if (lang === 'th') {
         newspaperDiv.classList.add('lang-en');
         newspaperDiv.classList.remove('lang-th');
         headerDiv.innerText = 'The Siam Times';
-        footerDiv.innerText = '© 2026 The Siam Times. All rights reserved.';
+        footerDiv.innerText = '© 2026 The Siam Times. All rights reserved. Modification or commercial use of the page layout, logos, or brand elements is strictly prohibited without prior permission. Images and referenced information remain the copyright of their respective sources as credited within the content.';
        
         const isThai = thaiCharCount > engCharCount;
         if (isThai) {
@@ -721,9 +721,18 @@ if (lang === 'th') {
         let imageCaption = '';
         let bodyPars = [];
 
-        if (uploadedImageSrc) {
+if (uploadedImageSrc) {
             if (paragraphs.length >= 3) {
-                imageCaption = paragraphs[2];
+                let rawCaption = paragraphs[2];
+                
+                // ค้นหาจุดจบประโยคแรก (. ! ?) ที่ตามด้วยช่องว่าง
+                const match = rawCaption.match(/^([^.!?]+[.!?]+)\s+(.*)$/);
+                if (match) {
+                    imageCaption = `${match[1]} ${match[2]}`;
+                } else {
+                    imageCaption = rawCaption;
+                }
+                
                 bodyPars = paragraphs.slice(3); 
             }
             
