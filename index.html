@@ -835,13 +835,17 @@ function copyFinalText() {
         alert('เกิดข้อผิดพลาด ไม่สามารถคัดลอกได้ครับ');
     });
 }
-
-// ฟังก์ชันสำหรับ Double Click ที่หน้าหนังสือพิมพ์เพื่อคัดลอก HTML
-document.getElementById('result-newspaper').addEventListener('dblclick', function(e) {
+// ฟังก์ชันสำหรับ Double Click ที่หน้าหนังสือพิมพ์เพื่อคัดลอกทั้งโค้ดและรูปแบบ
+document.getElementById('result-newspaper').addEventListener('dblclick', async function(e) {
     if (window.getSelection().toString().length > 0) return;
 
-    const styles = document.querySelector('style').innerHTML;
-    const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
+    let styles = document.querySelector('style').innerHTML;
+    
+    // แปลง path ของฟอนต์ Chomsky ให้เป็น Absolute URL เพื่อให้โหลดฟอนต์ได้เมื่อนำไปวางในโปรแกรมอื่น
+    const fontUrl = new URL('Chomsky.woff2', window.location.href).href;
+    styles = styles.replace(/url\(['"]?Chomsky\.woff2['"]?\)/g, `url('${fontUrl}')`);
+
+    const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
     
     const newspaperNode = this.cloneNode(true);
     newspaperNode.style.display = 'block';
@@ -864,9 +868,20 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
 </body>
 </html>`;
 
-    navigator.clipboard.writeText(htmlContent).then(() => {
+    try {
+        // สร้างข้อมูล 2 แบบ: HTML สำหรับโปรแกรมทั่วไป (Word, Email) และ Plain Text สำหรับโปรแกรมเขียนโค้ด
+        const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+        const textBlob = new Blob([htmlContent], { type: 'text/plain' });
+        
+        const clipboardItem = new ClipboardItem({
+            'text/html': htmlBlob,
+            'text/plain': textBlob
+        });
+
+        await navigator.clipboard.write([clipboardItem]);
+
         const toast = document.createElement('div');
-        toast.innerHTML = '✅ <b>Copied!</b><br>คัดลอกโค้ด HTML เรียบร้อย<br><span style="font-size:12px; font-weight:normal;">สามารถนำไปวางในไฟล์ .html ใหม่ได้เลย</span>';
+        toast.innerHTML = '✅ <b>Copied!</b><br>คัดลอกรูปแบบหนังสือพิมพ์เรียบร้อย<br><span style="font-size:12px; font-weight:normal;">นำไปวางใน Word หรืออีเมลเพื่อดูผลลัพธ์ได้เลย</span>';
         Object.assign(toast.style, {
             position: 'fixed',
             bottom: '30px',
@@ -892,11 +907,15 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
             setTimeout(() => toast.remove(), 300);
         }, 3500);
         
-    }).catch(err => {
+    } catch (err) {
         console.error('Copy failed:', err);
-        alert('เกิดข้อผิดพลาดในการคัดลอกโค้ด HTML ครับ');
-    });
+        // ทำงานในโหมดปกติหากบราวเซอร์หรือระบบปฏิบัติการไม่รองรับ Rich Text Clipboard อย่างสมบูรณ์
+        navigator.clipboard.writeText(htmlContent).then(() => {
+            alert('คัดลอกโค้ด HTML เรียบร้อยแล้ว (ทำงานในโหมดปกติ)');
+        });
+    }
 });
+
 
 function clearDraftText() {
     const draftBox = document.getElementById('draft').value='';
