@@ -836,25 +836,21 @@ function copyFinalText() {
     });
 }
 
-// ฟังก์ชันสำหรับ Double Click ที่หน้าหนังสือพิมพ์เพื่อคัดลอกทั้งโค้ดและรูปแบบ (อัปเดตป้องกัน Error)
-document.getElementById('result-newspaper').addEventListener('dblclick', async function(e) {
-    // ป้องกันการคลุมดำข้อความแบบปกติเมื่อกดดับเบิ้ลคลิก
+// ฟังก์ชันสำหรับ Double Click ที่หน้าหนังสือพิมพ์เพื่อคัดลอกทั้งโค้ดและรูปแบบ
+document.getElementById('result-newspaper').addEventListener('dblclick', function(e) {
     window.getSelection().removeAllRanges();
+    const newspaperNode = this;
 
-    const newspaperNode = this; 
-    
-    // 1. เตรียมข้อมูล CSS Styles และลิงก์ฟอนต์
     let styles = document.querySelector('style').innerHTML;
     try {
         const fontUrl = new URL('Chomsky.woff2', window.location.href).href;
         styles = styles.replace(/url\(['"]?Chomsky\.woff2['"]?\)/g, `url('${fontUrl}')`);
-    } catch (e) {
-        console.warn('URL parsing failed, using original font path.');
+    } catch (err) {
+        console.warn('URL parsing failed');
     }
-    
+
     const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
 
-    // โค้ด HTML เต็มรูปแบบ (สำหรับการคัดลอกโค้ดดิบ)
     const htmlContent = `<!DOCTYPE html>
 <html lang="th">
 <head>
@@ -870,68 +866,68 @@ document.getElementById('result-newspaper').addEventListener('dblclick', async f
 </body>
 </html>`;
 
-    let copySuccess = false;
+    // 1. ให้โหมดสำรองทำงานก่อนแบบทันทีเพื่อไม่ให้เสียสิทธิ User Gesture จากเบราว์เซอร์
+    let fallbackSuccess = false;
+    try {
+        const tempStyle = document.createElement('style');
+        tempStyle.innerHTML = styles;
+        newspaperNode.prepend(tempStyle);
 
-    // 2. พยายามคัดลอกแบบ Rich Text ด้วยเทคโนโลยีใหม่ (รองรับ HTTPS)
+        const range = document.createRange();
+        range.selectNode(newspaperNode);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        fallbackSuccess = document.execCommand('copy');
+
+        selection.removeAllRanges();
+        newspaperNode.removeChild(tempStyle);
+    } catch (err) {
+        console.warn('Fallback copy failed');
+    }
+
+    // 2. ใช้ Clipboard API รุ่นใหม่คัดลอกโค้ดเต็มทับลงไป
     if (navigator.clipboard && window.ClipboardItem) {
-        try {
-            const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
-            const textBlob = new Blob([htmlContent], { type: 'text/plain' });
-            const clipboardItem = new ClipboardItem({
-                'text/html': htmlBlob,
-                'text/plain': textBlob
-            });
-            await navigator.clipboard.write([clipboardItem]);
-            copySuccess = true;
-        } catch (err) {
-            console.warn('ClipboardItem ไม่ทำงาน สลับไปใช้โหมดสำรอง...', err);
-        }
-    }
+        const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+        const textBlob = new Blob([htmlContent], { type: 'text/plain' });
+        const clipboardItem = new ClipboardItem({
+            'text/html': htmlBlob,
+            'text/plain': textBlob
+        });
 
-    // 3. ถ้าวิธีแรก Error (เช่น รันผ่าน HTTP ปกติ) ให้ใช้โหมดสำรอง (Fallback)
-    if (!copySuccess) {
-        try {
-            // สร้าง Style ชั่วคราวฝังเข้าไปในตัวหนังสือพิมพ์เพื่อให้ Word/Email มองเห็นรูปแบบ
-            const tempStyle = document.createElement('style');
-            tempStyle.innerHTML = styles;
-            newspaperNode.prepend(tempStyle);
-
-            // จำลองการคลุมดำ (Select) บริเวณหนังสือพิมพ์
-            const range = document.createRange();
-            range.selectNode(newspaperNode);
-            const selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-            // สั่งคัดลอกสิ่งที่คลุมดำไว้ (วิธีนี้รองรับทุกเบราว์เซอร์)
-            document.execCommand('copy');
-            
-            // ล้างค่าความสะอาดเมื่อคัดลอกเสร็จ
-            selection.removeAllRanges();
-            newspaperNode.removeChild(tempStyle);
-            copySuccess = true;
-        } catch (err) {
-            console.error('Fallback execCommand failed:', err);
-            
-            // ถ้ายกเลิกทั้งหมดไม่ได้จริงๆ ให้คัดลอกเฉพาะโค้ดดิบผ่าน Textarea
-            try {
-                const textArea = document.createElement("textarea");
-                textArea.value = htmlContent;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('คัดลอกสำเร็จเฉพาะโค้ด HTML (เนื่องจากข้อจำกัดของระบบ)');
-                return;
-            } catch (err2) {
-                alert('เบราว์เซอร์ของคุณไม่รองรับการคัดลอกอัตโนมัติ');
-                return;
+        navigator.clipboard.write([clipboardItem]).then(() => {
+            showCopyToast();
+        }).catch((err) => {
+            if (fallbackSuccess) {
+                showCopyToast();
+            } else {
+                fallbackRawCopy();
             }
+        });
+    } else {
+        if (fallbackSuccess) {
+            showCopyToast();
+        } else {
+            fallbackRawCopy();
         }
     }
 
-    // 4. แสดงข้อความแจ้งเตือน (Toast)
-    if (copySuccess) {
+    function fallbackRawCopy() {
+        try {
+            const textArea = document.createElement("textarea");
+            textArea.value = htmlContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('คัดลอกสำเร็จเฉพาะโค้ด HTML (เนื่องจากข้อจำกัดของเบราว์เซอร์)');
+        } catch(e) {
+            alert('เบราว์เซอร์ของคุณไม่รองรับการคัดลอกอัตโนมัติ');
+        }
+    }
+
+    function showCopyToast() {
         const toast = document.createElement('div');
         toast.innerHTML = '✅ <b>Copied!</b><br>คัดลอกรูปแบบหนังสือพิมพ์เรียบร้อย<br><span style="font-size:12px; font-weight:normal;">นำไปวางในโปรแกรม Word หรือ Email ได้เลย</span>';
         Object.assign(toast.style, {
@@ -943,7 +939,6 @@ document.getElementById('result-newspaper').addEventListener('dblclick', async f
             textAlign: 'center', lineHeight: '1.4'
         });
         document.body.appendChild(toast);
-        
         setTimeout(() => toast.style.opacity = '1', 10);
         setTimeout(() => {
             toast.style.opacity = '0';
@@ -951,14 +946,10 @@ document.getElementById('result-newspaper').addEventListener('dblclick', async f
         }, 3500);
     }
 });
+</script>
 
-function clearDraftText() {
-    const draftBox = document.getElementById('draft').value='';
-}
-
-function clearFinalText() {
-    const finalBox = document.getElementById('final').value='';
-}
+</body>
+</html>
 
     </script>
 
