@@ -840,7 +840,8 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
     if (window.getSelection().toString().length > 0) return;
 
     const styles = document.querySelector('style').innerHTML;
-    const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
+    const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
     
     const newspaperNode = this.cloneNode(true);
     newspaperNode.style.display = 'block';
