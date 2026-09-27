@@ -478,6 +478,25 @@ function clearDraftText() {
     }
 }
 
+// ฟังก์ชันแปลง Markdown เบื้องต้น (ตัวหนาและตัวเอียง)
+function parseMarkdown(text) {
+    if (!text) return '';
+    
+    // แปลง HTML entities ป้องกัน XSS เบื้องต้น
+    let safeText = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+        
+    // แทนที่ __text__ เป็นตัวหนา (<strong>)
+    safeText = safeText.replace(/__(.*?)__/g, '<strong>$1</strong>');
+    
+    // แทนที่ _text_ เป็นตัวเอียง (<em>)
+    safeText = safeText.replace(/_(.*?)_/g, '<em>$1</em>');
+    
+    return safeText;
+}
+
 function clearFinalText() {
     const finalBox = document.getElementById('final');
     if (!finalBox.value.trim()) {
@@ -735,8 +754,9 @@ if (lang === 'th') {
             bodyPars = paragraphs.slice(2);
         }
 
-        if (bodyPars.length > 0) {
-            newContentHTML += bodyPars.map(p => `<p>${p}</p>`).join('');
+// ตัวอย่างการนำไปใช้ในส่วนสร้างเนื้อหาหนังสือพิมพ์
+if (bodyPars.length > 0) {
+    newContentHTML += bodyPars.map(p => `<p>${parseMarkdown(p)}</p>`).join('');
         } else if (!uploadedImageSrc) {
             newContentHTML += `<p>${noContentMsg}</p>`;
         }
@@ -751,6 +771,8 @@ if (lang === 'th') {
     }
 
     contentDiv.innerHTML = newContentHTML;
+
+
 
     const now = new Date();
     const hour = now.getHours();
