@@ -796,9 +796,9 @@ if (bodyPars.length > 0) {
         const dName = thDays[dayIdx];
         const mName = thMonths[monthIdx];
         
-        const span1 = '<span>ปีที่ ' + (year - 2020) + ' ฉบับที่ ' + issueNo + '</span>';
+        const span1 = '<span>ปีที่ ' + (year - 2020) + '</span>';
         const span2 = '<span>วัน' + dName + 'ที่ ' + dateNum + ' ' + mName + ' พ.ศ. ' + thYear + '</span>';
-        const span3 = '<span>ราคา 15 บาท</span>';
+        const span3 = '<span>ฉบับที่ ' + issueNo + '</span>';
         
         dateHTML = span1 + span2 + span3;
     } else {
@@ -822,9 +822,9 @@ if (bodyPars.length > 0) {
         while (volNum >= 4) { volRoman += 'IV'; volNum -= 4; }
         while (volNum >= 1) { volRoman += 'I'; volNum -= 1; }
 
-        const span1 = '<span>VOL. ' + volRoman + '... No. ' + issueNo + '</span>';
+        const span1 = '<span>VOL. ' + volRoman + '</span>';
         const span2 = '<span>BANGKOK, ' + dName + ', ' + mName + ' ' + dateNum + ', ' + year + '</span>';
-        const span3 = '<span>$3.00</span>';
+        const span3 = '<span>NO. ' + issueNo + '</span>';
         
         dateHTML = span1 + span2 + span3;
     }
