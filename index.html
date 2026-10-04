@@ -15,7 +15,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.1.0/diff.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-    <!-- นำเข้าฟอนต์ Newsreader -->
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 
     <style>
@@ -37,7 +36,7 @@
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.85);
-            display: none; /* ซ่อนเป็นค่าเริ่มต้น */
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -109,7 +108,7 @@
             display: flex;
             flex-direction: column;
         }
-        .ai-controls select, .ai-controls input[type="file"] {
+        .ai-controls select, .ai-controls input[type="file"], .ai-controls input[type="text"] {
             padding: 8px 10px;
             font-size: 15px;
             border-radius: 6px;
@@ -122,7 +121,7 @@
             background: #6f42c1;
             padding: 10px 20px;
             align-self: flex-end;
-            margin-top: 15px; /* สำหรับกรณีห่อบรรทัด */
+            margin-top: 15px; 
         }
         .btn-ai:hover {
             background: #59339d;
@@ -188,26 +187,26 @@
         }
         
        @font-face {
-    font-family: 'Chomsky';
-    src: url('Chomsky.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-}
+            font-family: 'Chomsky';
+            src: url('Chomsky.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
 
-.nyt-slogan-box {
-    position: absolute;
-    left: 0;
-    border: 1px solid #212529;
-    padding: 16px 18px;
-    font-family: Lora, 'Chomsky';
-    font-size: 11px;
-    text-align: center;
-    font-style: normal;
-    font-weight: bold;
-    line-height: 1.4;
-}
+        .nyt-slogan-box {
+            position: absolute;
+            left: 0;
+            border: 1px solid #212529;
+            padding: 16px 18px;
+            font-family: Lora, 'Chomsky';
+            font-size: 11px;
+            text-align: center;
+            font-style: normal;
+            font-weight: bold;
+            line-height: 1.4;
+        }
 
-        .nyt-header { text-align: center; font-family: 'Chomsky'/*'UnifrakturMaguntia'*/; font-size: 70px; color: #212529; line-height: 1; }
+        .nyt-header { text-align: center; font-family: 'Chomsky'; font-size: 70px; color: #212529; line-height: 1; }
         .nyt-date-line { font-family: Lora; font-size: 12px; text-transform: uppercase; display: flex; justify-content: space-between; border-top: 1px solid #212529; border-bottom: 2px solid #212529; padding: 8px 0; margin-bottom: 35px; font-weight: bold; letter-spacing: 1px; }
         .nyt-title { font-family: 'Newsreader'; font-size: 52px; font-weight: 900; line-height: 1.1; text-align: left; margin-top: 0; margin-bottom: 20px; }
         
@@ -280,7 +279,6 @@
         .lang-th .nyt-footer { font-family: 'Sarabun'; }
         .lang-en .nyt-footer { font-family: Lora; }
 
-        /* Media Queries สำหรับหน้าจอมือถือ */
         @media screen and (max-width: 768px) {
             .container { flex-direction: column; }
             .ai-controls { align-items: stretch; padding: 20px; }
@@ -300,7 +298,6 @@
             .nyt-date-line { font-size: 10px; flex-direction: column; align-items: center; gap: 5px; text-align: center; }
         }
 
-        /* สไตล์สำหรับส่วนหัวของกล่องข้อความ และปุ่มต่างๆ */
         .box-header {
             display: flex;
             justify-content: space-between;
@@ -333,7 +330,7 @@
             padding: 5px 12px;
             font-size: 13px;
             font-weight: bold;
-            background: #dc3545; /* สีแดงสำหรับปุ่มล้างข้อมูล */
+            background: #dc3545;
             color: white;
             border: none;
             border-radius: 6px;
@@ -345,11 +342,51 @@
             background: #bb2d3b;
         }
 
+        /* Styles for Popup (Dialog) & Info Button */
+        .info-button {
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8em;
+            padding: 2px 6px;
+            margin-left: 5px;
+            color: #333;
+            vertical-align: middle;
+        }
+        .info-button:hover { background: #ddd; }
+
+dialog.credit-popup {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+}
+
+        
+       
+        dialog.credit-popup::backdrop { background: rgba(0, 0, 0, 0.6); }
+        .close-button {
+            margin-top: 15px;
+            padding: 8px 12px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .close-button:hover { background: #555; }
+
     </style>
 </head>
 <body>
 
-    <!-- Loading Overlay -->
     <div class="loader-overlay" id="global-loader">
         <div class="spinner"></div>
         <div class="loader-text" id="loader-text">กำลังประมวลผล...</div>
@@ -387,32 +424,27 @@
                 <option value="original">ภาพสีต้นฉบับ</option>
             </select>
         </div>
+        <div class="control-group">
+            <label for="img-attribution">Attribution (ใส่ HTML ได้):</label>
+            <input type="text" id="img-attribution" placeholder="ข้อมูลอ้างอิงลิขสิทธิ์">
+        </div>
         <button class="btn-ai" onclick="rewriteText()">✨ Generate Final Draft</button>
     </div>
 
     <div class="container">
-        <!-- ช่อง Draft พร้อมปุ่มล้างข้อมูล -->
         <div class="box">
             <div class="box-header">
                 <label for="draft">Draft</label>
-
-
-<!-- สำหรับช่อง Draft -->
-<button type="button" class="btn-clear" onclick="clearDraftText()">🗑️ ล้างข้อมูล</button>
-
+                <button type="button" class="btn-clear" onclick="clearDraftText()">🗑️️ ล้างข้อมูล</button>
             </div>
             <textarea id="draft" placeholder="Paste draft text here..."></textarea>
         </div>
 
-        <!-- ช่อง Final พร้อมปุ่มล้างข้อมูลและปุ่มคัดลอก -->
         <div class="box">
             <div class="box-header">
                 <label for="final">Final</label>
                 <div class="btn-action-group">
-           
-<!-- สำหรับช่อง Final -->
-<button type="button" class="btn-clear" onclick="clearFinalText()">🗑️ ล้างข้อมูล</button>
-
+                    <button type="button" class="btn-clear" onclick="clearFinalText()">🗑️ ล้างข้อมูล</button>
                     <button class="btn-copy" id="copyBtn" onclick="copyFinalText()">📋 Copy</button>
                 </div>
             </div>
@@ -420,7 +452,6 @@
         </div>
     </div>
    
-    
     <div class="btn-group">
         <button class="btn-proofread" onclick="compareTexts()">Show Proofread Marks</button>
         <button class="btn-nyt" onclick="generateNewspaper('en')">Read as English Newspaper</button>
@@ -452,7 +483,6 @@
     <script>
 let uploadedImageSrc = '';
 
-// ควบคุมการแสดงหน้าโหลด
 function showLoader(text) {
     const loaderText = document.getElementById('loader-text');
     if(text) loaderText.innerText = text;
@@ -463,7 +493,6 @@ function hideLoader() {
     document.getElementById('global-loader').style.display = 'none';
 }
 
-
 function clearDraftText() {
     const draftBox = document.getElementById('draft');
     if (!draftBox.value.trim()) {
@@ -472,28 +501,19 @@ function clearDraftText() {
     }
     if (confirm('ต้องการล้างข้อมูลในช่อง Draft ใช่หรือไม่?')) {
         draftBox.value = '';
-        // เพิ่มคำสั่งซ่อนกล่องผลลัพธ์เมื่อกดล้างข้อมูล
         document.getElementById('result-proofread').style.display = 'none';
         document.getElementById('result-newspaper').style.display = 'none';
     }
 }
 
-// ฟังก์ชันแปลง Markdown เบื้องต้น (ตัวหนาและตัวเอียง)
 function parseMarkdown(text) {
     if (!text) return '';
-    
-    // แปลง HTML entities ป้องกัน XSS เบื้องต้น
     let safeText = text
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
-        
-    // แทนที่ __text__ เป็นตัวหนา (<strong>)
     safeText = safeText.replace(/__(.*?)__/g, '<strong>$1</strong>');
-    
-    // แทนที่ _text_ เป็นตัวเอียง (<em>)
     safeText = safeText.replace(/_(.*?)_/g, '<em>$1</em>');
-    
     return safeText;
 }
 
@@ -505,13 +525,11 @@ function clearFinalText() {
     }
     if (confirm('ต้องการล้างข้อมูลในช่อง Final ใช่หรือไม่?')) {
         finalBox.value = '';
-        // เพิ่มคำสั่งซ่อนกล่องผลลัพธ์เมื่อกดล้างข้อมูล
         document.getElementById('result-proofread').style.display = 'none';
         document.getElementById('result-newspaper').style.display = 'none';
     }
 }
 
-// โหลดไฟล์รูปภาพเมื่อมีการเลือก
 document.getElementById('image-upload').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -605,7 +623,6 @@ function compareTexts() {
     resultDiv.appendChild(fragment);
 }
 
-// ฟังก์ชันสร้าง style สำหรับรูปภาพจากตัวเลือก
 function getDynamicImageStyle() {
     const borderVal = document.getElementById('img-border').value;
     const filterVal = document.getElementById('img-filter').value;
@@ -649,7 +666,7 @@ async function generateNewspaper(lang) {
 
     let needsTranslation = false;
 
-if (lang === 'th') {
+    if (lang === 'th') {
         newspaperDiv.classList.add('lang-th');
         newspaperDiv.classList.remove('lang-en');
         headerDiv.innerText = 'เดอะ สยาม ไทมส์';
@@ -684,7 +701,7 @@ if (lang === 'th') {
             }
         }
 
-} else {
+    } else {
         newspaperDiv.classList.add('lang-en');
         newspaperDiv.classList.remove('lang-th');
         headerDiv.innerText = 'The Siam Times';
@@ -733,6 +750,21 @@ if (lang === 'th') {
     
     const imgStyleCss = getDynamicImageStyle();
 
+    // สร้างส่วน Popup แจ้งเตือนลิขสิทธิ์ภาพ
+    let popupHtml = '';
+    let infoBtnHtml = '';
+    const imgAttribution = document.getElementById('img-attribution').value.trim();
+
+    if (imgAttribution !== '') {
+        infoBtnHtml = `<button class="info-button" aria-label="View Image Credit" onclick="document.getElementById('credit-popup').showModal()">i</button>`;
+        popupHtml = `
+        <dialog id="credit-popup" class="credit-popup">
+          <h3 style="margin-top: 0; font-family: 'Playfair Display', 'Sarabun';">Image Attribution</h3>
+          <div style="font-family: 'Lora', 'Sarabun'; margin-bottom: 20px;">${imgAttribution}</div>
+          <button class="close-button" onclick="document.getElementById('credit-popup').close()">Close</button>
+        </dialog>`;
+    }
+
     if (paragraphs.length >= 2) {
         newContentHTML += `<div class="nyt-inline-subheading">${paragraphs[1]}</div>`;
         
@@ -748,15 +780,15 @@ if (lang === 'th') {
             newContentHTML += `
             <div class="nyt-image-container">
                 <img class="nyt-image" src="${uploadedImageSrc}" alt="Newspaper Image" style="${imgStyleCss}">
-                ${imageCaption ? `<div class="nyt-image-caption">${imageCaption}</div>` : ''}
+                ${imageCaption ? `<div class="nyt-image-caption">${imageCaption}${infoBtnHtml}</div>` : (infoBtnHtml ? `<div class="nyt-image-caption">${infoBtnHtml}</div>` : '')}
+                ${popupHtml}
             </div>`;
         } else {
             bodyPars = paragraphs.slice(2);
         }
 
-// ตัวอย่างการนำไปใช้ในส่วนสร้างเนื้อหาหนังสือพิมพ์
-if (bodyPars.length > 0) {
-    newContentHTML += bodyPars.map(p => `<p>${parseMarkdown(p)}</p>`).join('');
+        if (bodyPars.length > 0) {
+            newContentHTML += bodyPars.map(p => `<p>${parseMarkdown(p)}</p>`).join('');
         } else if (!uploadedImageSrc) {
             newContentHTML += `<p>${noContentMsg}</p>`;
         }
@@ -765,14 +797,14 @@ if (bodyPars.length > 0) {
             newContentHTML += `
             <div class="nyt-image-container">
                 <img class="nyt-image" src="${uploadedImageSrc}" alt="Newspaper Image" style="${imgStyleCss}">
+                ${infoBtnHtml ? `<div class="nyt-image-caption">${infoBtnHtml}</div>` : ''}
+                ${popupHtml}
             </div>`;
         }
         newContentHTML += `<p>${noContentMsg}</p>`;
     }
 
     contentDiv.innerHTML = newContentHTML;
-
-
 
     const now = new Date();
     const hour = now.getHours();
@@ -832,7 +864,6 @@ if (bodyPars.length > 0) {
     dateLineDiv.innerHTML = dateHTML;
 }
 
-// ฟังก์ชันคัดลอกข้อความจากกล่อง Final
 function copyFinalText() {
     const finalBox = document.getElementById('final');
     const copyBtn = document.getElementById('copyBtn');
@@ -857,7 +888,6 @@ function copyFinalText() {
     });
 }
 
-// ฟังก์ชันสำหรับ Double Click ที่หน้าหนังสือพิมพ์เพื่อคัดลอก HTML
 document.getElementById('result-newspaper').addEventListener('dblclick', function(e) {
     if (window.getSelection().toString().length > 0) return;
 
@@ -920,13 +950,9 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
     });
 });
 
-function clearDraftText() {
-    const draftBox = document.getElementById('draft').value='';
-}
-
-function clearFinalText() {
-    const finalBox = document.getElementById('final').value='';
-}
+// ฟังก์ชันถูกนิยามไว้ด้านบนแล้ว ลบส่วนที่ซ้ำซ้อนเพื่อป้องกันข้อผิดพลาด
+// function clearDraftText() { ... }
+// function clearFinalText() { ... }
 
     </script>
 
