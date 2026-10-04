@@ -578,6 +578,7 @@ document.getElementById('image-upload').addEventListener('change', function(e) {
 });
 
 // ฟังก์ชันดึงข้อมูลจาก Wikimedia API
+
 async function fetchWikiCredit() {
     const urlInput = document.getElementById('wiki-url').value.trim();
     const isCropped = document.getElementById('wiki-cropped').checked;
@@ -621,11 +622,23 @@ async function fetchWikiCredit() {
 
         const metadata = page.imageinfo[0].extmetadata;
         let license = metadata.LicenseShortName ? metadata.LicenseShortName.value : 'Unknown License';
+        
         let artistHTML = metadata.Artist ? metadata.Artist.value : '';
-
         let tempDiv = document.createElement("div");
         tempDiv.innerHTML = artistHTML;
         let artist = tempDiv.textContent || tempDiv.innerText || "Unknown Author";
+
+        let imageTitle = "";
+        if (metadata.ObjectName) {
+            let titleDiv = document.createElement("div");
+            titleDiv.innerHTML = metadata.ObjectName.value;
+            imageTitle = titleDiv.textContent || titleDiv.innerText;
+        } else {
+            imageTitle = filename
+                .replace(/^File:/, '')
+                .replace(/\.[^/.]+$/, '')
+                .replace(/_/g, ' ');
+        }
 
         let actionText = isCropped ? "Cropped and republished" : "Republished";
         let creditStr = "";
@@ -633,9 +646,9 @@ async function fetchWikiCredit() {
         const isCC0 = license.toLowerCase().includes("cc0") || license.toLowerCase().includes("public domain");
 
         if (isCC0) {
-            creditStr = `${actionText} by The Siam Times, original image from Wikimedia Commons (${license}), available at: ${urlInput}`;
+            creditStr = `${actionText} by The Siam Times, original image "${imageTitle}" from Wikimedia Commons (${license}), available at: ${urlInput}`;
         } else {
-            creditStr = `${actionText} by The Siam Times, original image by ${artist} from Wikimedia Commons (${license}), available at: ${urlInput}`;
+            creditStr = `${actionText} by The Siam Times, original image "${imageTitle}" &copy; by ${artist} from Wikimedia Commons (${license}), available at: ${urlInput}`;
         }
 
         attributionInput.value = creditStr;
@@ -644,6 +657,7 @@ async function fetchWikiCredit() {
         alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับ API ของ Wikipedia');
     }
 }
+
 
 async function rewriteText() {
     const draft = document.getElementById('draft').value;
