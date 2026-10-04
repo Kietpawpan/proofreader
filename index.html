@@ -122,6 +122,12 @@
             padding: 10px 20px;
             align-self: flex-end;
             margin-top: 15px; 
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 6px #0000001a;
         }
         .btn-ai:hover {
             background: #59339d;
@@ -326,6 +332,12 @@
         .btn-copy:hover {
             background: #157347;
         }
+        .btn-fetch {
+            background: #0d6efd;
+        }
+        .btn-fetch:hover {
+            background: #0b5ed7;
+        }
         .btn-clear {
             padding: 5px 12px;
             font-size: 13px;
@@ -343,44 +355,41 @@
         }
 
         /* Styles for Popup (Dialog) & Info Button */
-
-        /* Styles for Popup (Dialog) & Info Button */
         .info-button {
             background: transparent;
             border: none;
             cursor: pointer;
             padding: 0;
             margin-left: 6px;
-            color: #6c757d; /* สีเดียวกับตัวอักษร Caption */
+            color: #6c757d; 
             vertical-align: middle;
             display: inline-flex;
             align-items: center;
             transition: color 0.3s;
+            box-shadow: none;
         }
         .info-button:hover { 
-            color: #212529; /* สีเข้มขึ้นเหมือนน้ำหมึกเมื่อเอาเมาส์ชี้ */
+            color: #212529; 
+            background: transparent;
         }
         .info-button svg {
             width: 14px;
             height: 14px;
-            fill: currentColor; /* ให้สีของไอคอนเปลี่ยนตาม text color อัตโนมัติ */
+            fill: currentColor;
         }
 
-
-dialog.credit-popup {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 20px;
-    max-width: 400px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    font-family: Arial, sans-serif;
-    line-height: 1.5;
-    color: #212529;
-    text-align: left;
-}
-
+        dialog.credit-popup {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            color: #212529;
+            text-align: left;
+        }
         
-       
         dialog.credit-popup::backdrop { background: rgba(0, 0, 0, 0.6); }
         .close-button {
             margin-top: 15px;
@@ -435,18 +444,32 @@ dialog.credit-popup {
                 <option value="original">ภาพสีต้นฉบับ</option>
             </select>
         </div>
-        <div class="control-group">
-            <label for="img-attribution">Attribution (ใส่ HTML ได้):</label>
-            <input type="text" id="img-attribution" placeholder="ข้อมูลอ้างอิงลิขสิทธิ์">
+        
+        <!-- ส่วนที่เพิ่มใหม่: ดึงข้อมูลอัตโนมัติจาก Wiki -->
+        <div class="control-group" style="flex: 1 1 100%;">
+            <label for="wiki-url">ดึงข้อมูลลิขสิทธิ์จาก Wikimedia Commons อัตโนมัติ:</label>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="wiki-url" placeholder="วาง URL ภาพจาก Wiki ที่นี่..." style="flex-grow: 1; min-width: 200px;">
+                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; margin: 0; cursor: pointer; font-size: 14px;">
+                    <input type="checkbox" id="wiki-cropped" style="width: auto;"> ภาพถูกครอป
+                </label>
+                <button type="button" class="btn-copy btn-fetch" style="margin:0;" onclick="fetchWikiCredit()">ดึงข้อมูล</button>
+            </div>
         </div>
-        <button class="btn-ai" onclick="rewriteText()">✨ Generate Final Draft</button>
+
+        <div class="control-group" style="flex: 1 1 100%;">
+            <label for="img-attribution">Attribution (แก้ไขข้อความก่อนนำไปใช้ได้):</label>
+            <input type="text" id="img-attribution" placeholder="ข้อมูลอ้างอิงลิขสิทธิ์จะแสดงที่นี่ (ใส่ HTML ได้)">
+        </div>
+
+        <button class="btn-ai" style="flex: 1 1 100%; max-width: 300px; margin: 15px auto 0 auto;" onclick="rewriteText()">✨ Generate Final Draft</button>
     </div>
 
     <div class="container">
         <div class="box">
             <div class="box-header">
                 <label for="draft">Draft</label>
-                <button type="button" class="btn-clear" onclick="clearDraftText()">🗑️️ ล้างข้อมูล</button>
+                <button type="button" class="btn-clear" onclick="clearDraftText()">🗑 ล้างข้อมูล</button>
             </div>
             <textarea id="draft" placeholder="Paste draft text here..."></textarea>
         </div>
@@ -553,6 +576,74 @@ document.getElementById('image-upload').addEventListener('change', function(e) {
         uploadedImageSrc = '';
     }
 });
+
+// ฟังก์ชันดึงข้อมูลจาก Wikimedia API
+async function fetchWikiCredit() {
+    const urlInput = document.getElementById('wiki-url').value.trim();
+    const isCropped = document.getElementById('wiki-cropped').checked;
+    const attributionInput = document.getElementById('img-attribution');
+
+    if (!urlInput) {
+        alert('กรุณาใส่ URL ของภาพจาก Wikimedia Commons ก่อนครับ');
+        return;
+    }
+
+    attributionInput.value = 'กำลังดึงข้อมูล...';
+
+    let filename = '';
+    try {
+        const urlObj = new URL(urlInput);
+        const pathParts = urlObj.pathname.split('/');
+        filename = pathParts[pathParts.length - 1];
+        if(!filename.startsWith('File:')) {
+             filename = 'File:' + filename;
+        }
+        filename = decodeURIComponent(filename);
+    } catch (e) {
+        attributionInput.value = '';
+        alert('URL ไม่ถูกต้อง กรุณาใช้ URL ที่มาจาก Wikimedia Commons');
+        return;
+    }
+
+    const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(filename)}&prop=imageinfo&iiprop=extmetadata&format=json&origin=*`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        const pages = data.query.pages;
+        const page = Object.values(pages)[0];
+
+        if (page.missing === "") {
+            attributionInput.value = '';
+            alert('ไม่พบภาพนี้ กรุณาตรวจสอบ URL อีกครั้ง');
+            return;
+        }
+
+        const metadata = page.imageinfo[0].extmetadata;
+        let license = metadata.LicenseShortName ? metadata.LicenseShortName.value : 'Unknown License';
+        let artistHTML = metadata.Artist ? metadata.Artist.value : '';
+
+        let tempDiv = document.createElement("div");
+        tempDiv.innerHTML = artistHTML;
+        let artist = tempDiv.textContent || tempDiv.innerText || "Unknown Author";
+
+        let actionText = isCropped ? "Cropped and republished" : "Republished";
+        let creditStr = "";
+
+        const isCC0 = license.toLowerCase().includes("cc0") || license.toLowerCase().includes("public domain");
+
+        if (isCC0) {
+            creditStr = `${actionText} by The Siam Times, original image from Wikimedia Commons (${license}), available at: ${urlInput}`;
+        } else {
+            creditStr = `${actionText} by The Siam Times, original image by ${artist} from Wikimedia Commons (${license}), available at: ${urlInput}`;
+        }
+
+        attributionInput.value = creditStr;
+    } catch (error) {
+        attributionInput.value = '';
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับ API ของ Wikipedia');
+    }
+}
 
 async function rewriteText() {
     const draft = document.getElementById('draft').value;
@@ -761,25 +852,17 @@ async function generateNewspaper(lang) {
     
     const imgStyleCss = getDynamicImageStyle();
 
-    // สร้างส่วน Popup แจ้งเตือนลิขสิทธิ์ภาพ
     let popupHtml = '';
     let infoBtnHtml = '';
     const imgAttribution = document.getElementById('img-attribution').value.trim();
 
     if (imgAttribution !== '') {
-
         infoBtnHtml = `<button class="info-button" aria-label="View Image Credit" onclick="document.getElementById('credit-popup').showModal()" title="ดูแหล่งที่มาของภาพ">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-2a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
             </svg>
         </button>`;
-/*
-        infoBtnHtml = `<button class="info-button" aria-label="View Image Credit" onclick="document.getElementById('credit-popup').showModal()" title="ดูแหล่งที่มาของภาพ">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14h-2v-6h2zm-1-8a1.5 1.5 0 1 1 1.5-1.5A1.5 1.5 0 0 1 12 8z"/>
-            </svg>
-        </button>`;
-*/
+
         popupHtml = `
         <dialog id="credit-popup" class="credit-popup">
           <h3 style="margin-top: 0; font-family: 'Playfair Display', 'Sarabun';">Image Attribution</h3>
@@ -972,11 +1055,6 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
         alert('เกิดข้อผิดพลาดในการคัดลอกโค้ด HTML ครับ');
     });
 });
-
-// ฟังก์ชันถูกนิยามไว้ด้านบนแล้ว ลบส่วนที่ซ้ำซ้อนเพื่อป้องกันข้อผิดพลาด
-// function clearDraftText() { ... }
-// function clearFinalText() { ... }
-
     </script>
 
 </body>
