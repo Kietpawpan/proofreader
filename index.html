@@ -415,6 +415,15 @@
     <h2>Professional Proofreader</h2>
 
     <div class="ai-controls">
+        <!-- เพิ่มส่วนเลือก AI Model ตรงนี้ -->
+        <div class="control-group">
+            <label for="ai-model">AI Model:</label>
+            <select id="ai-model">
+                <option value="claude">Claude (Sonnet 5.5)</option>
+                <option value="gemini">Gemini (3 Flash)</option>
+            </select>
+        </div>
+
         <div class="control-group">
             <label for="ai-style">AI Rewrite Style:</label>
             <select id="ai-style">
@@ -445,7 +454,7 @@
             </select>
         </div>
         
-        <!-- ส่วนที่เพิ่มใหม่: ดึงข้อมูลอัตโนมัติจาก Wiki -->
+        <!-- ดึงข้อมูลอัตโนมัติจาก Wiki -->
         <div class="control-group" style="flex: 1 1 100%;">
             <label for="wiki-url">ดึงข้อมูลลิขสิทธิ์จาก Wikimedia Commons อัตโนมัติ:</label>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
@@ -485,7 +494,7 @@
             <textarea id="final" placeholder="Paste final text here..."></textarea>
         </div>
     </div>
-   
+    
     <div class="btn-group">
         <button class="btn-proofread" onclick="compareTexts()">Show Proofread Marks</button>
         <button class="btn-nyt" onclick="generateNewspaper('en')">Read as English Newspaper</button>
@@ -669,6 +678,7 @@ async function rewriteText() {
     }
 
     const style = document.getElementById('ai-style').value;
+    const aiModel = document.getElementById('ai-model').value; // อัปเดตดึงค่า AI Model
     
     finalBox.value = 'กำลังประมวลผลด้วย AI โปรดรอสักครู่...';
     showLoader('กำลังให้ AI เขียนเนื้อหาใหม่ โปรดรอสักครู่...');
@@ -684,7 +694,8 @@ async function rewriteText() {
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
                 draft: augmentedDraft,
-                style: style
+                style: style,
+                aiModel: aiModel // อัปเดตส่งค่า aiModel ไปยัง Backend
             })
         });
 
@@ -776,6 +787,7 @@ async function generateNewspaper(lang) {
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbySUJvCYbctRhB00m_h5_8w5sA-FBy5gM-sCMeAOavM5g2dTQH6pTAUtc0jlEyTQvKK/exec';
     
     const currentStyle = document.getElementById('ai-style').value;
+    const aiModel = document.getElementById('ai-model').value; // อัปเดตดึงค่า AI Model
 
     const thaiCharCount = (final.match(/[\u0E00-\u0E7F]/g) || []).length;
     const engCharCount = (final.match(/[a-zA-Z]/g) || []).length;
@@ -804,7 +816,8 @@ async function generateNewspaper(lang) {
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({
                         draft: translatePrompt,
-                        style: 'Thai Newspaper'
+                        style: 'Thai Newspaper',
+                        aiModel: aiModel // อัปเดตส่งค่า aiModel
                     })
                 });
                 const data = await response.json();
@@ -822,7 +835,7 @@ async function generateNewspaper(lang) {
         newspaperDiv.classList.remove('lang-th');
         headerDiv.innerText = 'The Siam Times';
         footerDiv.innerText = '© 2026 The Siam Times. All rights reserved. Images and referenced information remain the copyright of their respective sources as credited within the content.';
-       
+        
         const isThai = thaiCharCount > engCharCount;
         if (isThai) {
             needsTranslation = true;
@@ -839,7 +852,8 @@ async function generateNewspaper(lang) {
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({
                         draft: translatePrompt,
-                        style: currentStyle
+                        style: currentStyle,
+                        aiModel: aiModel // อัปเดตส่งค่า aiModel
                     })
                 });
                 const data = await response.json();
