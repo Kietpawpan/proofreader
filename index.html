@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -409,13 +409,13 @@
 
     <div class="loader-overlay" id="global-loader">
         <div class="spinner"></div>
-        <div class="loader-text" id="loader-text">กำลังประมวลผล...</div>
+        <div class="loader-text" id="loader-text">Processing...</div>
     </div>
 
     <h2>Professional Proofreader</h2>
 
     <div class="ai-controls">
-        <!-- เพิ่มส่วนเลือก AI Model ตรงนี้ -->
+        <!-- Add AI Model selection here -->
         <div class="control-group">
             <label for="ai-model">AI Model:</label>
             <select id="ai-model">
@@ -434,41 +434,41 @@
             </select>
         </div>
         <div class="control-group">
-            <label for="image-upload">แทรกรูปภาพ:</label>
+            <label for="image-upload">Insert Image:</label>
             <input type="file" id="image-upload" accept="image/*">
         </div>
         <div class="control-group">
-            <label for="img-border">เส้นขอบรูปภาพ:</label>
+            <label for="img-border">Image Border:</label>
             <select id="img-border">
-                <option value="0">0px (ไม่มีเส้นขอบ)</option>
+                <option value="0">0px (No border)</option>
                 <option value="1px solid #212529" selected>1px</option>
                 <option value="2px solid #212529">2px</option>
                 <option value="3px solid #212529">3px</option>
             </select>
         </div>
         <div class="control-group">
-            <label for="img-filter">สไตล์รูปภาพ:</label>
+            <label for="img-filter">Image Style:</label>
             <select id="img-filter">
-                <option value="newspaper" selected>ฟิลเตอร์หนังสือพิมพ์เก่า</option>
-                <option value="original">ภาพสีต้นฉบับ</option>
+                <option value="newspaper" selected>Vintage Newspaper Filter</option>
+                <option value="original">Original Color</option>
             </select>
         </div>
         
-        <!-- ดึงข้อมูลอัตโนมัติจาก Wiki -->
+        <!-- Auto-fetch from Wiki -->
         <div class="control-group" style="flex: 1 1 100%;">
-            <label for="wiki-url">ดึงข้อมูลลิขสิทธิ์จาก Wikimedia Commons อัตโนมัติ:</label>
+            <label for="wiki-url">Auto-fetch copyright from Wikimedia Commons:</label>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="wiki-url" placeholder="วาง URL ภาพจาก Wiki ที่นี่..." style="flex-grow: 1; min-width: 200px;">
+                <input type="text" id="wiki-url" placeholder="Paste Wiki Image URL here..." style="flex-grow: 1; min-width: 200px;">
                 <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; margin: 0; cursor: pointer; font-size: 14px;">
-                    <input type="checkbox" id="wiki-cropped" style="width: auto;"> ภาพถูกครอป
+                    <input type="checkbox" id="wiki-cropped" style="width: auto;"> Image cropped
                 </label>
-                <button type="button" class="btn-copy btn-fetch" style="margin:0;" onclick="fetchWikiCredit()">ดึงข้อมูล</button>
+                <button type="button" class="btn-copy btn-fetch" style="margin:0;" onclick="fetchWikiCredit()">Fetch</button>
             </div>
         </div>
 
         <div class="control-group" style="flex: 1 1 100%;">
-            <label for="img-attribution">Attribution (แก้ไขข้อความก่อนนำไปใช้ได้):</label>
-            <input type="text" id="img-attribution" placeholder="ข้อมูลอ้างอิงลิขสิทธิ์จะแสดงที่นี่ (ใส่ HTML ได้)">
+            <label for="img-attribution">Attribution (Editable before use):</label>
+            <input type="text" id="img-attribution" placeholder="Copyright reference will appear here (HTML allowed)">
         </div>
 
         <button class="btn-ai" style="flex: 1 1 100%; max-width: 300px; margin: 15px auto 0 auto;" onclick="rewriteText()">✨ Generate Final Draft</button>
@@ -478,7 +478,7 @@
         <div class="box">
             <div class="box-header">
                 <label for="draft">Draft</label>
-                <button type="button" class="btn-clear" onclick="clearDraftText()">🗑 ล้างข้อมูล</button>
+                <button type="button" class="btn-clear" onclick="clearDraftText()">🗑 Clear Data</button>
             </div>
             <textarea id="draft" placeholder="Paste draft text here..."></textarea>
         </div>
@@ -487,7 +487,7 @@
             <div class="box-header">
                 <label for="final">Final</label>
                 <div class="btn-action-group">
-                    <button type="button" class="btn-clear" onclick="clearFinalText()">🗑️ ล้างข้อมูล</button>
+                    <button type="button" class="btn-clear" onclick="clearFinalText()">🗑️ Clear Data</button>
                     <button class="btn-copy" id="copyBtn" onclick="copyFinalText()">📋 Copy</button>
                 </div>
             </div>
@@ -498,7 +498,7 @@
     <div class="btn-group">
         <button class="btn-proofread" onclick="compareTexts()">Show Proofread Marks</button>
         <button class="btn-nyt" onclick="generateNewspaper('en')">Read as English Newspaper</button>
-        <button class="btn-thai" onclick="generateNewspaper('th')">อ่านแบบหนังสือพิมพ์ไทย</button>
+        <button class="btn-thai" onclick="generateNewspaper('th')">Read as Thai Newspaper</button>
     </div>
 
     <div class="result-container" id="result-proofread">
@@ -539,10 +539,10 @@ function hideLoader() {
 function clearDraftText() {
     const draftBox = document.getElementById('draft');
     if (!draftBox.value.trim()) {
-        alert('ช่อง Draft ว่างอยู่แล้วครับ');
+        alert('Draft box is already empty.');
         return;
     }
-    if (confirm('ต้องการล้างข้อมูลในช่อง Draft ใช่หรือไม่?')) {
+    if (confirm('Are you sure you want to clear the Draft box?')) {
         draftBox.value = '';
         document.getElementById('result-proofread').style.display = 'none';
         document.getElementById('result-newspaper').style.display = 'none';
@@ -560,18 +560,21 @@ function parseMarkdown(text) {
     return safeText;
 }
 
+
+function clearDraftText() {
+    const draftBox = document.getElementById('draft');
+    draftBox.value = '';
+    document.getElementById('result-proofread').style.display = 'none';
+    document.getElementById('result-newspaper').style.display = 'none';
+}
+
 function clearFinalText() {
     const finalBox = document.getElementById('final');
-    if (!finalBox.value.trim()) {
-        alert('ช่อง Final ว่างอยู่แล้วครับ');
-        return;
-    }
-    if (confirm('ต้องการล้างข้อมูลในช่อง Final ใช่หรือไม่?')) {
-        finalBox.value = '';
-        document.getElementById('result-proofread').style.display = 'none';
-        document.getElementById('result-newspaper').style.display = 'none';
-    }
+    finalBox.value = '';
+    document.getElementById('result-proofread').style.display = 'none';
+    document.getElementById('result-newspaper').style.display = 'none';
 }
+
 
 document.getElementById('image-upload').addEventListener('change', function(e) {
     const file = e.target.files[0];
@@ -586,19 +589,18 @@ document.getElementById('image-upload').addEventListener('change', function(e) {
     }
 });
 
-// ฟังก์ชันดึงข้อมูลจาก Wikimedia API
-
+// Auto-fetch data from Wikimedia API
 async function fetchWikiCredit() {
     const urlInput = document.getElementById('wiki-url').value.trim();
     const isCropped = document.getElementById('wiki-cropped').checked;
     const attributionInput = document.getElementById('img-attribution');
 
     if (!urlInput) {
-        alert('กรุณาใส่ URL ของภาพจาก Wikimedia Commons ก่อนครับ');
+        alert('Please enter a Wikimedia Commons image URL first.');
         return;
     }
 
-    attributionInput.value = 'กำลังดึงข้อมูล...';
+    attributionInput.value = 'Fetching data...';
 
     let filename = '';
     try {
@@ -611,7 +613,7 @@ async function fetchWikiCredit() {
         filename = decodeURIComponent(filename);
     } catch (e) {
         attributionInput.value = '';
-        alert('URL ไม่ถูกต้อง กรุณาใช้ URL ที่มาจาก Wikimedia Commons');
+        alert('Invalid URL. Please use a Wikimedia Commons URL.');
         return;
     }
 
@@ -625,7 +627,7 @@ async function fetchWikiCredit() {
 
         if (page.missing === "") {
             attributionInput.value = '';
-            alert('ไม่พบภาพนี้ กรุณาตรวจสอบ URL อีกครั้ง');
+            alert('Image not found. Please check the URL again.');
             return;
         }
 
@@ -663,7 +665,7 @@ async function fetchWikiCredit() {
         attributionInput.value = creditStr;
     } catch (error) {
         attributionInput.value = '';
-        alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับ API ของ Wikipedia');
+        alert('Error connecting to Wikipedia API.');
     }
 }
 
@@ -673,15 +675,15 @@ async function rewriteText() {
     const finalBox = document.getElementById('final');
     
     if (!draft) {
-        alert('กรุณาใส่ข้อความในช่อง Draft ก่อนใช้งาน AI ครับ');
+        alert('Please enter text in the Draft box before using AI.');
         return;
     }
 
     const style = document.getElementById('ai-style').value;
-    const aiModel = document.getElementById('ai-model').value; // อัปเดตดึงค่า AI Model
+    const aiModel = document.getElementById('ai-model').value; 
     
-    finalBox.value = 'กำลังประมวลผลด้วย AI โปรดรอสักครู่...';
-    showLoader('กำลังให้ AI เขียนเนื้อหาใหม่ โปรดรอสักครู่...');
+    finalBox.value = 'Processing with AI, please wait...';
+    showLoader('AI is rewriting the content, please wait...');
 
     const instructionPrompt = "You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content. \n\nOriginal Text to rewrite:\n";
     const augmentedDraft = instructionPrompt + draft;
@@ -695,7 +697,7 @@ async function rewriteText() {
             body: JSON.stringify({
                 draft: augmentedDraft,
                 style: style,
-                aiModel: aiModel // อัปเดตส่งค่า aiModel ไปยัง Backend
+                aiModel: aiModel 
             })
         });
 
@@ -704,10 +706,10 @@ async function rewriteText() {
         if (data.result) {
             finalBox.value = data.result;
         } else {
-            finalBox.value = 'เกิดข้อผิดพลาดจาก Backend: ' + (data.error || 'Unknown error');
+            finalBox.value = 'Backend error: ' + (data.error || 'Unknown error');
         }
     } catch (error) {
-        finalBox.value = 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์';
+        finalBox.value = 'Error connecting to the server.';
         console.error(error);
     } finally {
         hideLoader();
@@ -787,7 +789,7 @@ async function generateNewspaper(lang) {
     const scriptUrl = 'https://script.google.com/macros/s/AKfycbySUJvCYbctRhB00m_h5_8w5sA-FBy5gM-sCMeAOavM5g2dTQH6pTAUtc0jlEyTQvKK/exec';
     
     const currentStyle = document.getElementById('ai-style').value;
-    const aiModel = document.getElementById('ai-model').value; // อัปเดตดึงค่า AI Model
+    const aiModel = document.getElementById('ai-model').value; 
 
     const thaiCharCount = (final.match(/[\u0E00-\u0E7F]/g) || []).length;
     const engCharCount = (final.match(/[a-zA-Z]/g) || []).length;
@@ -803,10 +805,10 @@ async function generateNewspaper(lang) {
         const isEnglish = engCharCount > thaiCharCount;
         if (isEnglish) {
             needsTranslation = true;
-            titleDiv.innerText = 'กำลังแปลภาษา...';
-            contentDiv.innerHTML = '<p>กำลังแปลเนื้อหา... โปรดรอสักครู่</p>';
+            titleDiv.innerText = 'Translating...';
+            contentDiv.innerHTML = '<p>Translating content... Please wait.</p>';
             
-            showLoader('กำลังให้ AI แปลเนื้อหาเป็นภาษาไทย โปรดรอสักครู่...');
+            showLoader('AI is translating content to Thai, please wait...');
             
             const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO THAI. Ensure the output is entirely in Thai. You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
             
@@ -817,14 +819,14 @@ async function generateNewspaper(lang) {
                     body: JSON.stringify({
                         draft: translatePrompt,
                         style: 'Thai Newspaper',
-                        aiModel: aiModel // อัปเดตส่งค่า aiModel
+                        aiModel: aiModel
                     })
                 });
                 const data = await response.json();
                 if (data.result) processedText = data.result;
             } catch (error) {
                 console.error(error);
-                contentDiv.innerHTML = '<p>เกิดข้อผิดพลาดในการแปลภาษา ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้</p>';
+                contentDiv.innerHTML = '<p>Translation error. Could not connect to the server.</p>';
                 hideLoader();
                 return;
             }
@@ -853,7 +855,7 @@ async function generateNewspaper(lang) {
                     body: JSON.stringify({
                         draft: translatePrompt,
                         style: currentStyle,
-                        aiModel: aiModel // อัปเดตส่งค่า aiModel
+                        aiModel: aiModel
                     })
                 });
                 const data = await response.json();
@@ -885,7 +887,7 @@ async function generateNewspaper(lang) {
     const imgAttribution = document.getElementById('img-attribution').value.trim();
 
     if (imgAttribution !== '') {
-        infoBtnHtml = `<button class="info-button" aria-label="View Image Credit" onclick="document.getElementById('credit-popup').showModal()" title="ดูแหล่งที่มาของภาพ">
+        infoBtnHtml = `<button class="info-button" aria-label="View Image Credit" onclick="document.getElementById('credit-popup').showModal()" title="View image source">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-2a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
             </svg>
@@ -1003,7 +1005,7 @@ function copyFinalText() {
     const copyBtn = document.getElementById('copyBtn');
     
     if (!finalBox.value.trim()) {
-        alert('ไม่มีข้อความให้คัดลอกครับ');
+        alert('No text to copy.');
         return;
     }
 
@@ -1018,7 +1020,7 @@ function copyFinalText() {
         }, 2000);
     }).catch(err => {
         console.error('Failed to copy text: ', err);
-        alert('เกิดข้อผิดพลาด ไม่สามารถคัดลอกได้ครับ');
+        alert('An error occurred. Could not copy.');
     });
 }
 
@@ -1034,7 +1036,7 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
     newspaperNode.style.margin = '40px auto';
 
     const htmlContent = `<!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1052,7 +1054,7 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
 
     navigator.clipboard.writeText(htmlContent).then(() => {
         const toast = document.createElement('div');
-        toast.innerHTML = '✅ <b>Copied!</b><br>คัดลอกโค้ด HTML เรียบร้อย<br><span style="font-size:12px; font-weight:normal;">สามารถนำไปวางในไฟล์ .html ใหม่ได้เลย</span>';
+        toast.innerHTML = '✅ <b>Copied!</b><br>HTML code copied successfully.<br><span style="font-size:12px; font-weight:normal;">You can paste it into a new .html file.</span>';
         Object.assign(toast.style, {
             position: 'fixed',
             bottom: '30px',
@@ -1080,7 +1082,7 @@ document.getElementById('result-newspaper').addEventListener('dblclick', functio
         
     }).catch(err => {
         console.error('Copy failed:', err);
-        alert('เกิดข้อผิดพลาดในการคัดลอกโค้ด HTML ครับ');
+        alert('An error occurred while copying HTML code.');
     });
 });
     </script>
