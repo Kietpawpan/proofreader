@@ -192,7 +192,7 @@
             margin-bottom: 10px;
         }
         
-       @font-face {
+        @font-face {
             font-family: 'Chomsky';
             src: url('Chomsky.woff2') format('woff2');
             font-weight: normal;
@@ -403,689 +403,815 @@
         }
         .close-button:hover { background: #555; }
 
+        /* Authentication Overlay Styles */
+        #auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #e9ecef;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        .auth-box {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px #0000001a;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            font-family: Lora;
+        }
+        .auth-box h2 {
+            margin-top: 0;
+            color: #343a40;
+            font-family: 'Playfair Display';
+        }
+        .auth-box p {
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        .auth-box input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            font-family: Lora;
+            text-align: center;
+            background: #f8f9fa;
+        }
+        .auth-box button {
+            width: 100%;
+            background: #6f42c1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px #0000001a;
+            transition: all 0.3s;
+        }
+        .auth-box button:hover {
+            background: #59339d;
+        }
+        #auth-error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 15px;
+            display: none;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+        #main-app {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <div class="loader-overlay" id="global-loader">
-        <div class="spinner"></div>
-        <div class="loader-text" id="loader-text">Processing...</div>
+    <!-- Authentication Overlay -->
+    <div id="auth-overlay">
+        <div class="auth-box">
+            <h2>Authentication Required</h2>
+            <p>Please enter the secret key to access the application</p>
+            <input type="password" id="secret-key-input" placeholder="Enter Secret Key">
+            <button onclick="checkSecretKey()">Access App</button>
+            <p id="auth-error">Incorrect key. Please try again.</p>
+        </div>
     </div>
 
-    <h2>Professional Proofreader</h2>
-
-    <div class="ai-controls">
-        <!-- Add AI Model selection here -->
-        <div class="control-group">
-            <label for="ai-model">AI Model:</label>
-            <select id="ai-model">
-                <option value="claude">Claude (Sonnet 5.5)</option>
-                <option value="gemini">Gemini (3 Flash)</option>
-            </select>
+    <!-- Wrap all existing content in main-app -->
+    <div id="main-app">
+        <div class="loader-overlay" id="global-loader">
+            <div class="spinner"></div>
+            <div class="loader-text" id="loader-text">Processing...</div>
         </div>
 
-        <div class="control-group">
-            <label for="ai-style">AI Rewrite Style:</label>
-            <select id="ai-style">
-                <option value="the New York Times">New York Times</option>
-                <option value="Strunk and White (The Elements of Style)">Strunk and White</option>
-                <option value="Academic English">Academic English</option>
-                <option value="the King James Bible">King James' Bible</option>
-            </select>
-        </div>
-        <div class="control-group">
-            <label for="image-upload">Insert Image:</label>
-            <input type="file" id="image-upload" accept="image/*">
-        </div>
-        <div class="control-group">
-            <label for="img-border">Image Border:</label>
-            <select id="img-border">
-                <option value="0">0px (No border)</option>
-                <option value="1px solid #212529" selected>1px</option>
-                <option value="2px solid #212529">2px</option>
-                <option value="3px solid #212529">3px</option>
-            </select>
-        </div>
-        <div class="control-group">
-            <label for="img-filter">Image Style:</label>
-            <select id="img-filter">
-                <option value="newspaper" selected>Vintage Newspaper Filter</option>
-                <option value="original">Original Color</option>
-            </select>
-        </div>
-        
-        <!-- Auto-fetch from Wiki -->
-        <div class="control-group" style="flex: 1 1 100%;">
-            <label for="wiki-url">Auto-fetch copyright from Wikimedia Commons:</label>
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="wiki-url" placeholder="Paste Wiki Image URL here..." style="flex-grow: 1; min-width: 200px;">
-                <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; margin: 0; cursor: pointer; font-size: 14px;">
-                    <input type="checkbox" id="wiki-cropped" style="width: auto;"> Image cropped
-                </label>
-                <button type="button" class="btn-copy btn-fetch" style="margin:0;" onclick="fetchWikiCredit()">Fetch</button>
+        <h2>Professional Proofreader</h2>
+
+        <div class="ai-controls">
+            <div class="control-group">
+                <label for="ai-model">AI Model:</label>
+                <select id="ai-model">
+                    <option value="claude">Claude (Sonnet 5.5)</option>
+                    <option value="gemini">Gemini (3 Flash)</option>
+                </select>
             </div>
-        </div>
 
-        <div class="control-group" style="flex: 1 1 100%;">
-            <label for="img-attribution">Attribution (Editable before use):</label>
-            <input type="text" id="img-attribution" placeholder="Copyright reference will appear here (HTML allowed)">
-        </div>
-
-        <button class="btn-ai" style="flex: 1 1 100%; max-width: 300px; margin: 15px auto 0 auto;" onclick="rewriteText()">✨ Generate Final Draft</button>
-    </div>
-
-    <div class="container">
-        <div class="box">
-            <div class="box-header">
-                <label for="draft">Draft</label>
-                <button type="button" class="btn-clear" onclick="clearDraftText()">🗑 Clear Data</button>
+            <div class="control-group">
+                <label for="ai-style">AI Rewrite Style:</label>
+                <select id="ai-style">
+                    <option value="the New York Times">New York Times</option>
+                    <option value="Strunk and White (The Elements of Style)">Strunk and White</option>
+                    <option value="Academic English">Academic English</option>
+                    <option value="the King James Bible">King James' Bible</option>
+                </select>
             </div>
-            <textarea id="draft" placeholder="Paste draft text here..."></textarea>
-        </div>
-
-        <div class="box">
-            <div class="box-header">
-                <label for="final">Final</label>
-                <div class="btn-action-group">
-                    <button type="button" class="btn-clear" onclick="clearFinalText()">🗑️ Clear Data</button>
-                    <button class="btn-copy" id="copyBtn" onclick="copyFinalText()">📋 Copy</button>
+            <div class="control-group">
+                <label for="image-upload">Insert Image:</label>
+                <input type="file" id="image-upload" accept="image/*">
+            </div>
+            <div class="control-group">
+                <label for="img-border">Image Border:</label>
+                <select id="img-border">
+                    <option value="0">0px (No border)</option>
+                    <option value="1px solid #212529" selected>1px</option>
+                    <option value="2px solid #212529">2px</option>
+                    <option value="3px solid #212529">3px</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="img-filter">Image Style:</label>
+                <select id="img-filter">
+                    <option value="newspaper" selected>Vintage Newspaper Filter</option>
+                    <option value="original">Original Color</option>
+                </select>
+            </div>
+            
+            <div class="control-group" style="flex: 1 1 100%;">
+                <label for="wiki-url">Auto-fetch copyright from Wikimedia Commons:</label>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <input type="text" id="wiki-url" placeholder="Paste Wiki Image URL here..." style="flex-grow: 1; min-width: 200px;">
+                    <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; margin: 0; cursor: pointer; font-size: 14px;">
+                        <input type="checkbox" id="wiki-cropped" style="width: auto;"> Image cropped
+                    </label>
+                    <button type="button" class="btn-copy btn-fetch" style="margin:0;" onclick="fetchWikiCredit()">Fetch</button>
                 </div>
             </div>
-            <textarea id="final" placeholder="Paste final text here..."></textarea>
-        </div>
-    </div>
-    
-    <div class="btn-group">
-        <button class="btn-proofread" onclick="compareTexts()">Show Proofread Marks</button>
-        <button class="btn-nyt" onclick="generateNewspaper('en')">Read as English Newspaper</button>
-        <button class="btn-thai" onclick="generateNewspaper('th')">Read as Thai Newspaper</button>
-    </div>
 
-    <div class="result-container" id="result-proofread">
-        <em>Comparison results will be displayed here...</em>
-    </div>
-
-    <div class="newspaper-container lang-en" id="result-newspaper">
-        <div class="nyt-top-row">
-            <div class="nyt-slogan-box">
-                "All the News<br>That's Nice to Print"
+            <div class="control-group" style="flex: 1 1 100%;">
+                <label for="img-attribution">Attribution (Editable before use):</label>
+                <input type="text" id="img-attribution" placeholder="Copyright reference will appear here (HTML allowed)">
             </div>
-            <div class="nyt-header">The Siam Times</div>
+
+            <button class="btn-ai" style="flex: 1 1 100%; max-width: 300px; margin: 15px auto 0 auto;" onclick="rewriteText()">✨ Generate Final Draft</button>
         </div>
-        <div class="nyt-date-line"></div>
+
+        <div class="container">
+            <div class="box">
+                <div class="box-header">
+                    <label for="draft">Draft</label>
+                    <button type="button" class="btn-clear" onclick="clearDraftText()">🗑 Clear Data</button>
+                </div>
+                <textarea id="draft" placeholder="Paste draft text here..."></textarea>
+            </div>
+
+            <div class="box">
+                <div class="box-header">
+                    <label for="final">Final</label>
+                    <div class="btn-action-group">
+                        <button type="button" class="btn-clear" onclick="clearFinalText()">🗑️ Clear Data</button>
+                        <button class="btn-copy" id="copyBtn" onclick="copyFinalText()">📋 Copy</button>
+                    </div>
+                </div>
+                <textarea id="final" placeholder="Paste final text here..."></textarea>
+            </div>
+        </div>
         
-        <div class="nyt-title" id="nyt-title-display">LATEST UPDATES</div>
-
-        <div class="nyt-content" id="nyt-body">
-            <em>Newspaper content will be displayed here...</em>
+        <div class="btn-group">
+            <button class="btn-proofread" onclick="compareTexts()">Show Proofread Marks</button>
+            <button class="btn-nyt" onclick="generateNewspaper('en')">Read as English Newspaper</button>
+            <button class="btn-thai" onclick="generateNewspaper('th')">Read as Thai Newspaper</button>
         </div>
 
-        <div class="nyt-footer" id="nyt-footer-display"></div>
+        <div class="result-container" id="result-proofread">
+            <em>Comparison results will be displayed here...</em>
+        </div>
+
+        <div class="newspaper-container lang-en" id="result-newspaper">
+            <div class="nyt-top-row">
+                <div class="nyt-slogan-box">
+                    "All the News<br>That's Nice to Print"
+                </div>
+                <div class="nyt-header">The Siam Times</div>
+            </div>
+            <div class="nyt-date-line"></div>
+            
+            <div class="nyt-title" id="nyt-title-display">LATEST UPDATES</div>
+
+            <div class="nyt-content" id="nyt-body">
+                <em>Newspaper content will be displayed here...</em>
+            </div>
+
+            <div class="nyt-footer" id="nyt-footer-display"></div>
+        </div>
     </div>
 
     <script>
-let uploadedImageSrc = '';
+        // ประกาศตัวแปรเก็บ URL ของ Google Apps Script และรหัสผ่านที่ตรวจสอบแล้ว
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySUJvCYbctRhB00m_h5_8w5sA-FBy5gM-sCMeAOavM5g2dTQH6pTAUtc0jlEyTQvKK/exec';
+        let appSecretKey = '';
 
-function showLoader(text) {
-    const loaderText = document.getElementById('loader-text');
-    if(text) loaderText.innerText = text;
-    document.getElementById('global-loader').style.display = 'flex';
-}
+        async function checkSecretKey() {
+            const inputVal = document.getElementById('secret-key-input').value.trim();
+            const errorMsg = document.getElementById('auth-error');
+            const btn = document.querySelector('.auth-box button');
 
-function hideLoader() {
-    document.getElementById('global-loader').style.display = 'none';
-}
-
-function clearDraftText() {
-    const draftBox = document.getElementById('draft');
-    if (!draftBox.value.trim()) {
-        alert('Draft box is already empty.');
-        return;
-    }
-    if (confirm('Are you sure you want to clear the Draft box?')) {
-        draftBox.value = '';
-        document.getElementById('result-proofread').style.display = 'none';
-        document.getElementById('result-newspaper').style.display = 'none';
-    }
-}
-
-function parseMarkdown(text) {
-    if (!text) return '';
-    let safeText = text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    safeText = safeText.replace(/__(.*?)__/g, '<strong>$1</strong>');
-    safeText = safeText.replace(/_(.*?)_/g, '<em>$1</em>');
-    return safeText;
-}
-
-
-function clearDraftText() {
-    const draftBox = document.getElementById('draft');
-    draftBox.value = '';
-    document.getElementById('result-proofread').style.display = 'none';
-    document.getElementById('result-newspaper').style.display = 'none';
-}
-
-function clearFinalText() {
-    const finalBox = document.getElementById('final');
-    finalBox.value = '';
-    document.getElementById('result-proofread').style.display = 'none';
-    document.getElementById('result-newspaper').style.display = 'none';
-}
-
-
-document.getElementById('image-upload').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            uploadedImageSrc = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    } else {
-        uploadedImageSrc = '';
-    }
-});
-
-// Auto-fetch data from Wikimedia API
-async function fetchWikiCredit() {
-    const urlInput = document.getElementById('wiki-url').value.trim();
-    const isCropped = document.getElementById('wiki-cropped').checked;
-    const attributionInput = document.getElementById('img-attribution');
-
-    if (!urlInput) {
-        alert('Please enter a Wikimedia Commons image URL first.');
-        return;
-    }
-
-    attributionInput.value = 'Fetching data...';
-
-    let filename = '';
-    try {
-        const urlObj = new URL(urlInput);
-        const pathParts = urlObj.pathname.split('/');
-        filename = pathParts[pathParts.length - 1];
-        if(!filename.startsWith('File:')) {
-             filename = 'File:' + filename;
-        }
-        filename = decodeURIComponent(filename);
-    } catch (e) {
-        attributionInput.value = '';
-        alert('Invalid URL. Please use a Wikimedia Commons URL.');
-        return;
-    }
-
-    const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(filename)}&prop=imageinfo&iiprop=extmetadata&format=json&origin=*`;
-
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const pages = data.query.pages;
-        const page = Object.values(pages)[0];
-
-        if (page.missing === "") {
-            attributionInput.value = '';
-            alert('Image not found. Please check the URL again.');
-            return;
-        }
-
-        const metadata = page.imageinfo[0].extmetadata;
-        let license = metadata.LicenseShortName ? metadata.LicenseShortName.value : 'Unknown License';
-        
-        let artistHTML = metadata.Artist ? metadata.Artist.value : '';
-        let tempDiv = document.createElement("div");
-        tempDiv.innerHTML = artistHTML;
-        let artist = tempDiv.textContent || tempDiv.innerText || "Unknown Author";
-
-        let imageTitle = "";
-        if (metadata.ObjectName) {
-            let titleDiv = document.createElement("div");
-            titleDiv.innerHTML = metadata.ObjectName.value;
-            imageTitle = titleDiv.textContent || titleDiv.innerText;
-        } else {
-            imageTitle = filename
-                .replace(/^File:/, '')
-                .replace(/\.[^/.]+$/, '')
-                .replace(/_/g, ' ');
-        }
-
-        let actionText = isCropped ? "Cropped and republished" : "Republished";
-        let creditStr = "";
-
-        const isCC0 = license.toLowerCase().includes("cc0") || license.toLowerCase().includes("public domain");
-
-        if (isCC0) {
-            creditStr = `${actionText} by The Siam Times, original image "${imageTitle}" from Wikimedia Commons (${license}), available at: ${urlInput}`;
-        } else {
-            creditStr = `${actionText} by The Siam Times, original image "${imageTitle}" &copy; by ${artist} from Wikimedia Commons (${license}), available at: ${urlInput}`;
-        }
-
-        attributionInput.value = creditStr;
-    } catch (error) {
-        attributionInput.value = '';
-        alert('Error connecting to Wikipedia API.');
-    }
-}
-
-
-async function rewriteText() {
-    const draft = document.getElementById('draft').value;
-    const finalBox = document.getElementById('final');
-    
-    if (!draft) {
-        alert('Please enter text in the Draft box before using AI.');
-        return;
-    }
-
-    const style = document.getElementById('ai-style').value;
-    const aiModel = document.getElementById('ai-model').value; 
-    
-    finalBox.value = 'Processing with AI, please wait...';
-    showLoader('AI is rewriting the content, please wait...');
-
-    const instructionPrompt = "You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content. \n\nOriginal Text to rewrite:\n";
-    const augmentedDraft = instructionPrompt + draft;
-
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbySUJvCYbctRhB00m_h5_8w5sA-FBy5gM-sCMeAOavM5g2dTQH6pTAUtc0jlEyTQvKK/exec';
-
-    try {
-        const response = await fetch(scriptUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-                draft: augmentedDraft,
-                style: style,
-                aiModel: aiModel 
-            })
-        });
-
-        const data = await response.json();
-        
-        if (data.result) {
-            finalBox.value = data.result;
-        } else {
-            finalBox.value = 'Backend error: ' + (data.error || 'Unknown error');
-        }
-    } catch (error) {
-        finalBox.value = 'Error connecting to the server.';
-        console.error(error);
-    } finally {
-        hideLoader();
-    }
-}
-
-function compareTexts() {
-    const draft = document.getElementById('draft').value;
-    const final = document.getElementById('final').value;
-    const resultDiv = document.getElementById('result-proofread');
-    const newspaperDiv = document.getElementById('result-newspaper');
-
-    if (!draft && !final) {
-        alert('Please enter text in both fields');
-        return;
-    }
-
-    newspaperDiv.style.display = 'none';
-    resultDiv.style.display = 'block';
-
-    const diff = Diff.diffWords(draft, final);
-    
-    resultDiv.innerHTML = '';
-    const fragment = document.createDocumentFragment();
-
-    diff.forEach((part) => {
-        const span = document.createElement(part.added ? 'ins' : part.removed ? 'del' : 'span');
-        const lines = part.value.split('\n');
-        
-        for (let i = 0; i < lines.length; i++) {
-            span.appendChild(document.createTextNode(lines[i]));
-            if (i < lines.length - 1) {
-                span.appendChild(document.createElement('br'));
+            if (!inputVal) {
+                errorMsg.innerText = 'Please enter a key';
+                errorMsg.style.display = 'block';
+                return;
             }
-        }
-        
-        fragment.appendChild(span);
-    });
 
-    resultDiv.appendChild(fragment);
-}
+            btn.innerText = 'Checking...';
+            btn.disabled = true;
+            errorMsg.style.display = 'none';
 
-function getDynamicImageStyle() {
-    const borderVal = document.getElementById('img-border').value;
-    const filterVal = document.getElementById('img-filter').value;
-    
-    let css = `border: ${borderVal === '0' ? 'none' : borderVal}; `;
-    
-    if (filterVal === 'newspaper') {
-        css += `filter: grayscale(100%) contrast(140%) sepia(20%); mix-blend-mode: multiply;`;
-    } else {
-        css += `filter: none; mix-blend-mode: normal;`;
-    }
-    
-    return css;
-}
-
-async function generateNewspaper(lang) {
-    const final = document.getElementById('final').value;
-    const resultDiv = document.getElementById('result-proofread');
-    const newspaperDiv = document.getElementById('result-newspaper');
-    const contentDiv = document.getElementById('nyt-body');
-    const titleDiv = document.getElementById('nyt-title-display');
-    const dateLineDiv = document.querySelector('.nyt-date-line');
-    const headerDiv = document.querySelector('.nyt-header');
-    const footerDiv = document.getElementById('nyt-footer-display');
-
-    if (!final) {
-        alert('Please enter text in the Final box');
-        return;
-    }
-
-    resultDiv.style.display = 'none';
-    newspaperDiv.style.display = 'block';
-
-    let processedText = final;
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbySUJvCYbctRhB00m_h5_8w5sA-FBy5gM-sCMeAOavM5g2dTQH6pTAUtc0jlEyTQvKK/exec';
-    
-    const currentStyle = document.getElementById('ai-style').value;
-    const aiModel = document.getElementById('ai-model').value; 
-
-    const thaiCharCount = (final.match(/[\u0E00-\u0E7F]/g) || []).length;
-    const engCharCount = (final.match(/[a-zA-Z]/g) || []).length;
-
-    let needsTranslation = false;
-
-    if (lang === 'th') {
-        newspaperDiv.classList.add('lang-th');
-        newspaperDiv.classList.remove('lang-en');
-        headerDiv.innerText = 'เดอะ สยาม ไทมส์';
-        footerDiv.innerText = '© 2569 The Siam Times สงวนลิขสิทธิ์ ภาพประกอบและข้อมูลอ้างอิงเป็นลิขสิทธิ์ของแหล่งที่มาตามที่ระบุไว้ในเนื้อหา';
-
-        const isEnglish = engCharCount > thaiCharCount;
-        if (isEnglish) {
-            needsTranslation = true;
-            titleDiv.innerText = 'Translating...';
-            contentDiv.innerHTML = '<p>Translating content... Please wait.</p>';
-            
-            showLoader('AI is translating content to Thai, please wait...');
-            
-            const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO THAI. Ensure the output is entirely in Thai. You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
-            
             try {
-                const response = await fetch(scriptUrl, {
+                const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({
-                        draft: translatePrompt,
-                        style: 'Thai Newspaper',
-                        aiModel: aiModel
+                        action: 'verify',
+                        secretKey: inputVal
                     })
                 });
+
                 const data = await response.json();
-                if (data.result) processedText = data.result;
+
+                if (data.success) {
+                    appSecretKey = inputVal;
+                    document.getElementById('auth-overlay').style.display = 'none';
+                    document.getElementById('main-app').style.display = 'block';
+                } else {
+                    errorMsg.innerText = 'Incorrect key. Please try again.';
+                    errorMsg.style.display = 'block';
+                    document.getElementById('secret-key-input').value = '';
+                    document.getElementById('secret-key-input').focus();
+                }
             } catch (error) {
-                console.error(error);
-                contentDiv.innerHTML = '<p>Translation error. Could not connect to the server.</p>';
-                hideLoader();
-                return;
+                errorMsg.innerText = 'Connection error. Please try again.';
+                errorMsg.style.display = 'block';
+            } finally {
+                btn.innerText = 'Access App';
+                btn.disabled = false;
             }
         }
 
-    } else {
-        newspaperDiv.classList.add('lang-en');
-        newspaperDiv.classList.remove('lang-th');
-        headerDiv.innerText = 'The Siam Times';
-        footerDiv.innerText = '© 2026 The Siam Times. All rights reserved. Images and referenced information remain the copyright of their respective sources as credited within the content.';
-        
-        const isThai = thaiCharCount > engCharCount;
-        if (isThai) {
-            needsTranslation = true;
-            titleDiv.innerText = 'Translating...';
-            contentDiv.innerHTML = '<p>Translating content... Please wait.</p>';
-            
-            showLoader('Translating to English via AI. Please wait...');
-            
-            const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO ENGLISH. Ensure the output is entirely in English. Adapt the tone to the style of " + currentStyle + ". You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
-            
+        document.getElementById('secret-key-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkSecretKey();
+            }
+        });
+
+        // Original Script Logic Below
+        let uploadedImageSrc = '';
+
+        function showLoader(text) {
+            const loaderText = document.getElementById('loader-text');
+            if(text) loaderText.innerText = text;
+            document.getElementById('global-loader').style.display = 'flex';
+        }
+
+        function hideLoader() {
+            document.getElementById('global-loader').style.display = 'none';
+        }
+
+        function clearDraftText() {
+            const draftBox = document.getElementById('draft');
+            if (!draftBox.value.trim()) {
+                alert('Draft box is already empty.');
+                return;
+            }
+            if (confirm('Are you sure you want to clear the Draft box?')) {
+                draftBox.value = '';
+                document.getElementById('result-proofread').style.display = 'none';
+                document.getElementById('result-newspaper').style.display = 'none';
+            }
+        }
+
+        function parseMarkdown(text) {
+            if (!text) return '';
+            let safeText = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+            safeText = safeText.replace(/__(.*?)__/g, '<strong>$1</strong>');
+            safeText = safeText.replace(/_(.*?)_/g, '<em>$1</em>');
+            return safeText;
+        }
+
+        function clearFinalText() {
+            const finalBox = document.getElementById('final');
+            finalBox.value = '';
+            document.getElementById('result-proofread').style.display = 'none';
+            document.getElementById('result-newspaper').style.display = 'none';
+        }
+
+        document.getElementById('image-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedImageSrc = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                uploadedImageSrc = '';
+            }
+        });
+
+        async function fetchWikiCredit() {
+            const urlInput = document.getElementById('wiki-url').value.trim();
+            const isCropped = document.getElementById('wiki-cropped').checked;
+            const attributionInput = document.getElementById('img-attribution');
+
+            if (!urlInput) {
+                alert('Please enter a Wikimedia Commons image URL first.');
+                return;
+            }
+
+            attributionInput.value = 'Fetching data...';
+
+            let filename = '';
             try {
-                const response = await fetch(scriptUrl, {
+                const urlObj = new URL(urlInput);
+                const pathParts = urlObj.pathname.split('/');
+                filename = pathParts[pathParts.length - 1];
+                if(!filename.startsWith('File:')) {
+                     filename = 'File:' + filename;
+                }
+                filename = decodeURIComponent(filename);
+            } catch (e) {
+                attributionInput.value = '';
+                alert('Invalid URL. Please use a Wikimedia Commons URL.');
+                return;
+            }
+
+            const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(filename)}&prop=imageinfo&iiprop=extmetadata&format=json&origin=*`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                const pages = data.query.pages;
+                const page = Object.values(pages)[0];
+
+                if (page.missing === "") {
+                    attributionInput.value = '';
+                    alert('Image not found. Please check the URL again.');
+                    return;
+                }
+
+                const metadata = page.imageinfo[0].extmetadata;
+                let license = metadata.LicenseShortName ? metadata.LicenseShortName.value : 'Unknown License';
+                
+                let artistHTML = metadata.Artist ? metadata.Artist.value : '';
+                let tempDiv = document.createElement("div");
+                tempDiv.innerHTML = artistHTML;
+                let artist = tempDiv.textContent || tempDiv.innerText || "Unknown Author";
+
+                let imageTitle = "";
+                if (metadata.ObjectName) {
+                    let titleDiv = document.createElement("div");
+                    titleDiv.innerHTML = metadata.ObjectName.value;
+                    imageTitle = titleDiv.textContent || titleDiv.innerText;
+                } else {
+                    imageTitle = filename
+                        .replace(/^File:/, '')
+                        .replace(/\.[^/.]+$/, '')
+                        .replace(/_/g, ' ');
+                }
+
+                let actionText = isCropped ? "Cropped and republished" : "Republished";
+                let creditStr = "";
+
+                const isCC0 = license.toLowerCase().includes("cc0") || license.toLowerCase().includes("public domain");
+
+                if (isCC0) {
+                    creditStr = `${actionText} by The Siam Times, original image "${imageTitle}" from Wikimedia Commons (${license}), available at: ${urlInput}`;
+                } else {
+                    creditStr = `${actionText} by The Siam Times, original image "${imageTitle}" &copy; by ${artist} from Wikimedia Commons (${license}), available at: ${urlInput}`;
+                }
+
+                attributionInput.value = creditStr;
+            } catch (error) {
+                attributionInput.value = '';
+                alert('Error connecting to Wikipedia API.');
+            }
+        }
+
+        async function rewriteText() {
+            const draft = document.getElementById('draft').value;
+            const finalBox = document.getElementById('final');
+            
+            if (!draft) {
+                alert('Please enter text in the Draft box before using AI.');
+                return;
+            }
+
+            const style = document.getElementById('ai-style').value;
+            const aiModel = document.getElementById('ai-model').value; 
+            
+            finalBox.value = 'Processing with AI, please wait...';
+            showLoader('AI is rewriting the content, please wait...');
+
+            const instructionPrompt = "You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content. \n\nOriginal Text to rewrite:\n";
+            const augmentedDraft = instructionPrompt + draft;
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({
-                        draft: translatePrompt,
-                        style: currentStyle,
-                        aiModel: aiModel
+                        secretKey: appSecretKey,
+                        draft: augmentedDraft,
+                        style: style,
+                        aiModel: aiModel 
                     })
                 });
+
                 const data = await response.json();
-                if (data.result) processedText = data.result;
+                
+                if (data.result) {
+                    finalBox.value = data.result;
+                } else {
+                    finalBox.value = 'Backend error: ' + (data.error || 'Unknown error');
+                }
             } catch (error) {
+                finalBox.value = 'Error connecting to the server.';
                 console.error(error);
-                contentDiv.innerHTML = '<p>Error translating text. Could not connect to the server.</p>';
+            } finally {
                 hideLoader();
+            }
+        }
+
+        function compareTexts() {
+            const draft = document.getElementById('draft').value;
+            const final = document.getElementById('final').value;
+            const resultDiv = document.getElementById('result-proofread');
+            const newspaperDiv = document.getElementById('result-newspaper');
+
+            if (!draft && !final) {
+                alert('Please enter text in both fields');
                 return;
             }
+
+            newspaperDiv.style.display = 'none';
+            resultDiv.style.display = 'block';
+
+            const diff = Diff.diffWords(draft, final);
+            
+            resultDiv.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+
+            diff.forEach((part) => {
+                const span = document.createElement(part.added ? 'ins' : part.removed ? 'del' : 'span');
+                const lines = part.value.split('\n');
+                
+                for (let i = 0; i < lines.length; i++) {
+                    span.appendChild(document.createTextNode(lines[i]));
+                    if (i < lines.length - 1) {
+                        span.appendChild(document.createElement('br'));
+                    }
+                }
+                
+                fragment.appendChild(span);
+            });
+
+            resultDiv.appendChild(fragment);
         }
-    }
 
-    if(needsTranslation) hideLoader();
-
-    const paragraphs = processedText.split(/\n+/).filter(p => p.trim() !== '');
-    
-    if (paragraphs.length >= 1) {
-        titleDiv.innerText = paragraphs[0];
-    }
-
-    let newContentHTML = '';
-    const noContentMsg = lang === 'th' ? 'ไม่มีเนื้อหาเพิ่มเติม' : 'No additional content provided.';
-    
-    const imgStyleCss = getDynamicImageStyle();
-
-    let popupHtml = '';
-    let infoBtnHtml = '';
-    const imgAttribution = document.getElementById('img-attribution').value.trim();
-
-    if (imgAttribution !== '') {
-        infoBtnHtml = `<button class="info-button" aria-label="View Image Credit" onclick="document.getElementById('credit-popup').showModal()" title="View image source">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-2a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-            </svg>
-        </button>`;
-
-        popupHtml = `
-        <dialog id="credit-popup" class="credit-popup">
-          <h3 style="margin-top: 0; font-family: 'Playfair Display', 'Sarabun';">Image Attribution</h3>
-          <div style="font-family: 'Lora', 'Sarabun'; margin-bottom: 20px;">${imgAttribution}</div>
-          <button class="close-button" onclick="document.getElementById('credit-popup').close()">Close</button>
-        </dialog>`;
-    }
-
-    if (paragraphs.length >= 2) {
-        newContentHTML += `<div class="nyt-inline-subheading">${paragraphs[1]}</div>`;
-        
-        let imageCaption = '';
-        let bodyPars = [];
-
-        if (uploadedImageSrc) {
-            if (paragraphs.length >= 3) {
-                imageCaption = paragraphs[2];
-                bodyPars = paragraphs.slice(3); 
+        function getDynamicImageStyle() {
+            const borderVal = document.getElementById('img-border').value;
+            const filterVal = document.getElementById('img-filter').value;
+            
+            let css = `border: ${borderVal === '0' ? 'none' : borderVal}; `;
+            
+            if (filterVal === 'newspaper') {
+                css += `filter: grayscale(100%) contrast(140%) sepia(20%); mix-blend-mode: multiply;`;
+            } else {
+                css += `filter: none; mix-blend-mode: normal;`;
             }
             
-            newContentHTML += `
-            <div class="nyt-image-container">
-                <img class="nyt-image" src="${uploadedImageSrc}" alt="Newspaper Image" style="${imgStyleCss}">
-                ${imageCaption ? `<div class="nyt-image-caption">${imageCaption}${infoBtnHtml}</div>` : (infoBtnHtml ? `<div class="nyt-image-caption">${infoBtnHtml}</div>` : '')}
-                ${popupHtml}
-            </div>`;
-        } else {
-            bodyPars = paragraphs.slice(2);
+            return css;
         }
 
-        if (bodyPars.length > 0) {
-            newContentHTML += bodyPars.map(p => `<p>${parseMarkdown(p)}</p>`).join('');
-        } else if (!uploadedImageSrc) {
-            newContentHTML += `<p>${noContentMsg}</p>`;
+        async function generateNewspaper(lang) {
+            const final = document.getElementById('final').value;
+            const resultDiv = document.getElementById('result-proofread');
+            const newspaperDiv = document.getElementById('result-newspaper');
+            const contentDiv = document.getElementById('nyt-body');
+            const titleDiv = document.getElementById('nyt-title-display');
+            const dateLineDiv = document.querySelector('.nyt-date-line');
+            const headerDiv = document.querySelector('.nyt-header');
+            const footerDiv = document.getElementById('nyt-footer-display');
+
+            if (!final) {
+                alert('Please enter text in the Final box');
+                return;
+            }
+
+            resultDiv.style.display = 'none';
+            newspaperDiv.style.display = 'block';
+
+            let processedText = final;
+            
+            const currentStyle = document.getElementById('ai-style').value;
+            const aiModel = document.getElementById('ai-model').value; 
+
+            const thaiCharCount = (final.match(/[\u0E00-\u0E7F]/g) || []).length;
+            const engCharCount = (final.match(/[a-zA-Z]/g) || []).length;
+
+            let needsTranslation = false;
+
+            if (lang === 'th') {
+                newspaperDiv.classList.add('lang-th');
+                newspaperDiv.classList.remove('lang-en');
+                headerDiv.innerText = 'เดอะ สยาม ไทมส์';
+                footerDiv.innerText = '© 2569 The Siam Times สงวนลิขสิทธิ์ ภาพประกอบและข้อมูลอ้างอิงเป็นลิขสิทธิ์ของแหล่งที่มาตามที่ระบุไว้ในเนื้อหา';
+
+                const isEnglish = engCharCount > thaiCharCount;
+                if (isEnglish) {
+                    needsTranslation = true;
+                    titleDiv.innerText = 'Translating...';
+                    contentDiv.innerHTML = '<p>Translating content... Please wait.</p>';
+                    
+                    showLoader('AI is translating content to Thai, please wait...');
+                    
+                    const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO THAI. Ensure the output is entirely in Thai. You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
+                    
+                    try {
+                        const response = await fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            body: JSON.stringify({
+                                secretKey: appSecretKey,
+                                draft: translatePrompt,
+                                style: 'Thai Newspaper',
+                                aiModel: aiModel
+                            })
+                        });
+                        const data = await response.json();
+                        if (data.result) processedText = data.result;
+                    } catch (error) {
+                        console.error(error);
+                        contentDiv.innerHTML = '<p>Translation error. Could not connect to the server.</p>';
+                        hideLoader();
+                        return;
+                    }
+                }
+
+            } else {
+                newspaperDiv.classList.add('lang-en');
+                newspaperDiv.classList.remove('lang-th');
+                headerDiv.innerText = 'The Siam Times';
+                footerDiv.innerText = '© 2026 The Siam Times. All rights reserved. Images and referenced information remain the copyright of their respective sources as credited within the content.';
+                
+                const isThai = thaiCharCount > engCharCount;
+                if (isThai) {
+                    needsTranslation = true;
+                    titleDiv.innerText = 'Translating...';
+                    contentDiv.innerHTML = '<p>Translating content... Please wait.</p>';
+                    
+                    showLoader('Translating to English via AI. Please wait...');
+                    
+                    const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO ENGLISH. Ensure the output is entirely in English. Adapt the tone to the style of " + currentStyle + ". You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
+                    
+                    try {
+                        const response = await fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            body: JSON.stringify({
+                                secretKey: appSecretKey,
+                                draft: translatePrompt,
+                                style: currentStyle,
+                                aiModel: aiModel
+                            })
+                        });
+                        const data = await response.json();
+                        if (data.result) processedText = data.result;
+                    } catch (error) {
+                        console.error(error);
+                        contentDiv.innerHTML = '<p>Error translating text. Could not connect to the server.</p>';
+                        hideLoader();
+                        return;
+                    }
+                }
+            }
+
+            if(needsTranslation) hideLoader();
+
+            const paragraphs = processedText.split(/\n+/).filter(p => p.trim() !== '');
+            
+            if (paragraphs.length >= 1) {
+                titleDiv.innerText = paragraphs[0];
+            }
+
+            let newContentHTML = '';
+            const noContentMsg = lang === 'th' ? 'ไม่มีเนื้อหาเพิ่มเติม' : 'No additional content provided.';
+            
+            const imgStyleCss = getDynamicImageStyle();
+
+            let popupHtml = '';
+            let infoBtnHtml = '';
+            const imgAttribution = document.getElementById('img-attribution').value.trim();
+
+            if (imgAttribution !== '') {
+                infoBtnHtml = `<button class="info-button" aria-label="View Image Credit" onclick="document.getElementById('credit-popup').showModal()" title="View image source">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-2a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                    </svg>
+                </button>`;
+
+                popupHtml = `
+                <dialog id="credit-popup" class="credit-popup">
+                  <h3 style="margin-top: 0; font-family: 'Playfair Display', 'Sarabun';">Image Attribution</h3>
+                  <div style="font-family: 'Lora', 'Sarabun'; margin-bottom: 20px;">${imgAttribution}</div>
+                  <button class="close-button" onclick="document.getElementById('credit-popup').close()">Close</button>
+                </dialog>`;
+            }
+
+            if (paragraphs.length >= 2) {
+                newContentHTML += `<div class="nyt-inline-subheading">${paragraphs[1]}</div>`;
+                
+                let imageCaption = '';
+                let bodyPars = [];
+
+                if (uploadedImageSrc) {
+                    if (paragraphs.length >= 3) {
+                        imageCaption = paragraphs[2];
+                        bodyPars = paragraphs.slice(3); 
+                    }
+                    
+                    newContentHTML += `
+                    <div class="nyt-image-container">
+                        <img class="nyt-image" src="${uploadedImageSrc}" alt="Newspaper Image" style="${imgStyleCss}">
+                        ${imageCaption ? `<div class="nyt-image-caption">${imageCaption}${infoBtnHtml}</div>` : (infoBtnHtml ? `<div class="nyt-image-caption">${infoBtnHtml}</div>` : '')}
+                        ${popupHtml}
+                    </div>`;
+                } else {
+                    bodyPars = paragraphs.slice(2);
+                }
+
+                if (bodyPars.length > 0) {
+                    newContentHTML += bodyPars.map(p => `<p>${parseMarkdown(p)}</p>`).join('');
+                } else if (!uploadedImageSrc) {
+                    newContentHTML += `<p>${noContentMsg}</p>`;
+                }
+            } else {
+                if (uploadedImageSrc) {
+                    newContentHTML += `
+                    <div class="nyt-image-container">
+                        <img class="nyt-image" src="${uploadedImageSrc}" alt="Newspaper Image" style="${imgStyleCss}">
+                        ${infoBtnHtml ? `<div class="nyt-image-caption">${infoBtnHtml}</div>` : ''}
+                        ${popupHtml}
+                    </div>`;
+                }
+                newContentHTML += `<p>${noContentMsg}</p>`;
+            }
+
+            contentDiv.innerHTML = newContentHTML;
+
+            const now = new Date();
+            const hour = now.getHours();
+            const dateNum = now.getDate();
+            const year = now.getFullYear();
+            const monthIdx = now.getMonth();
+            const dayIdx = now.getDay();
+
+            const enDays = 'SUNDAY MONDAY TUESDAY WEDNESDAY THURSDAY FRIDAY SATURDAY'.split(' ');
+            const thDays = 'อาทิตย์ จันทร์ อังคาร พุธ พฤหัสบดี ศุกร์ เสาร์'.split(' ');
+            
+            const enMonths = 'JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY AUGUST SEPTEMBER OCTOBER NOVEMBER DECEMBER'.split(' ');
+            const thMonths = 'มกราคม กุมภาพันธ์ มีนาคม เมษายน พฤษภาคม มิถุนายน กรกฎาคม สิงหาคม กันยายน ตุลาคม พฤศจิกายน ธันวาคม'.split(' ');
+
+            const issueNo = (monthIdx + 1) * 10000 + dateNum * 100 + hour;
+
+            let dateHTML = '';
+
+            if (lang === 'th') {
+                const thYear = year + 543;
+                const dName = thDays[dayIdx];
+                const mName = thMonths[monthIdx];
+                
+                const span1 = '<span>ปีที่ ' + (year - 2020) + '</span>';
+                const span2 = '<span>วัน' + dName + 'ที่ ' + dateNum + ' ' + mName + ' พ.ศ. ' + thYear + '</span>';
+                const span3 = '<span>ฉบับที่ ' + issueNo + '</span>';
+                
+                dateHTML = span1 + span2 + span3;
+            } else {
+                const dName = enDays[dayIdx];
+                const mName = enMonths[monthIdx];
+                
+                let volNum = year - 1851;
+                let volRoman = '';
+                
+                while (volNum >= 1000) { volRoman += 'M'; volNum -= 1000; }
+                while (volNum >= 900) { volRoman += 'CM'; volNum -= 900; }
+                while (volNum >= 500) { volRoman += 'D'; volNum -= 500; }
+                while (volNum >= 400) { volRoman += 'CD'; volNum -= 400; }
+                while (volNum >= 100) { volRoman += 'C'; volNum -= 100; }
+                while (volNum >= 90) { volRoman += 'XC'; volNum -= 90; }
+                while (volNum >= 50) { volRoman += 'L'; volNum -= 50; }
+                while (volNum >= 40) { volRoman += 'XL'; volNum -= 40; }
+                while (volNum >= 10) { volRoman += 'X'; volNum -= 10; }
+                while (volNum >= 9) { volRoman += 'IX'; volNum -= 9; }
+                while (volNum >= 5) { volRoman += 'V'; volNum -= 5; }
+                while (volNum >= 4) { volRoman += 'IV'; volNum -= 4; }
+                while (volNum >= 1) { volRoman += 'I'; volNum -= 1; }
+
+                const span1 = '<span>VOL. ' + volRoman + '</span>';
+                const span2 = '<span>BANGKOK, ' + dName + ', ' + mName + ' ' + dateNum + ', ' + year + '</span>';
+                const span3 = '<span>NO. ' + issueNo + '</span>';
+                
+                dateHTML = span1 + span2 + span3;
+            }
+
+            dateLineDiv.innerHTML = dateHTML;
         }
-    } else {
-        if (uploadedImageSrc) {
-            newContentHTML += `
-            <div class="nyt-image-container">
-                <img class="nyt-image" src="${uploadedImageSrc}" alt="Newspaper Image" style="${imgStyleCss}">
-                ${infoBtnHtml ? `<div class="nyt-image-caption">${infoBtnHtml}</div>` : ''}
-                ${popupHtml}
-            </div>`;
+
+        function copyFinalText() {
+            const finalBox = document.getElementById('final');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            if (!finalBox.value.trim()) {
+                alert('No text to copy.');
+                return;
+            }
+
+            navigator.clipboard.writeText(finalBox.value).then(() => {
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.style.background = '#0dcaf0';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.style.background = '#198754';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('An error occurred. Could not copy.');
+            });
         }
-        newContentHTML += `<p>${noContentMsg}</p>`;
-    }
 
-    contentDiv.innerHTML = newContentHTML;
+        document.getElementById('result-newspaper').addEventListener('dblclick', function(e) {
+            if (window.getSelection().toString().length > 0) return;
 
-    const now = new Date();
-    const hour = now.getHours();
-    const dateNum = now.getDate();
-    const year = now.getFullYear();
-    const monthIdx = now.getMonth();
-    const dayIdx = now.getDay();
+            const styles = document.querySelector('style').innerHTML;
+            const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
+            
+            const newspaperNode = this.cloneNode(true);
+            newspaperNode.style.display = 'block';
+            newspaperNode.style.margin = '40px auto';
 
-    const enDays = 'SUNDAY MONDAY TUESDAY WEDNESDAY THURSDAY FRIDAY SATURDAY'.split(' ');
-    const thDays = 'อาทิตย์ จันทร์ อังคาร พุธ พฤหัสบดี ศุกร์ เสาร์'.split(' ');
-    
-    const enMonths = 'JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY AUGUST SEPTEMBER OCTOBER NOVEMBER DECEMBER'.split(' ');
-    const thMonths = 'มกราคม กุมภาพันธ์ มีนาคม เมษายน พฤษภาคม มิถุนายน กรกฎาคม สิงหาคม กันยายน ตุลาคม พฤศจิกายน ธันวาคม'.split(' ');
+            const htmlContent = `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>The Siam Times</title>
+            ${fonts}
+            <style>
+                ${styles}
+                body { background: #e9ecef; margin: 0; padding: 20px; }
+            </style>
+        </head>
+        <body>
+            ${newspaperNode.outerHTML}
+        </body>
+        </html>`;
 
-    const issueNo = (monthIdx + 1) * 10000 + dateNum * 100 + hour;
-
-    let dateHTML = '';
-
-    if (lang === 'th') {
-        const thYear = year + 543;
-        const dName = thDays[dayIdx];
-        const mName = thMonths[monthIdx];
-        
-        const span1 = '<span>ปีที่ ' + (year - 2020) + '</span>';
-        const span2 = '<span>วัน' + dName + 'ที่ ' + dateNum + ' ' + mName + ' พ.ศ. ' + thYear + '</span>';
-        const span3 = '<span>ฉบับที่ ' + issueNo + '</span>';
-        
-        dateHTML = span1 + span2 + span3;
-    } else {
-        const dName = enDays[dayIdx];
-        const mName = enMonths[monthIdx];
-        
-        let volNum = year - 1851;
-        let volRoman = '';
-        
-        while (volNum >= 1000) { volRoman += 'M'; volNum -= 1000; }
-        while (volNum >= 900) { volRoman += 'CM'; volNum -= 900; }
-        while (volNum >= 500) { volRoman += 'D'; volNum -= 500; }
-        while (volNum >= 400) { volRoman += 'CD'; volNum -= 400; }
-        while (volNum >= 100) { volRoman += 'C'; volNum -= 100; }
-        while (volNum >= 90) { volRoman += 'XC'; volNum -= 90; }
-        while (volNum >= 50) { volRoman += 'L'; volNum -= 50; }
-        while (volNum >= 40) { volRoman += 'XL'; volNum -= 40; }
-        while (volNum >= 10) { volRoman += 'X'; volNum -= 10; }
-        while (volNum >= 9) { volRoman += 'IX'; volNum -= 9; }
-        while (volNum >= 5) { volRoman += 'V'; volNum -= 5; }
-        while (volNum >= 4) { volRoman += 'IV'; volNum -= 4; }
-        while (volNum >= 1) { volRoman += 'I'; volNum -= 1; }
-
-        const span1 = '<span>VOL. ' + volRoman + '</span>';
-        const span2 = '<span>BANGKOK, ' + dName + ', ' + mName + ' ' + dateNum + ', ' + year + '</span>';
-        const span3 = '<span>NO. ' + issueNo + '</span>';
-        
-        dateHTML = span1 + span2 + span3;
-    }
-
-    dateLineDiv.innerHTML = dateHTML;
-}
-
-function copyFinalText() {
-    const finalBox = document.getElementById('final');
-    const copyBtn = document.getElementById('copyBtn');
-    
-    if (!finalBox.value.trim()) {
-        alert('No text to copy.');
-        return;
-    }
-
-    navigator.clipboard.writeText(finalBox.value).then(() => {
-        const originalText = copyBtn.innerHTML;
-        copyBtn.innerHTML = '✅ Copied!';
-        copyBtn.style.background = '#0dcaf0';
-        
-        setTimeout(() => {
-            copyBtn.innerHTML = originalText;
-            copyBtn.style.background = '#198754';
-        }, 2000);
-    }).catch(err => {
-        console.error('Failed to copy text: ', err);
-        alert('An error occurred. Could not copy.');
-    });
-}
-
-document.getElementById('result-newspaper').addEventListener('dblclick', function(e) {
-    if (window.getSelection().toString().length > 0) return;
-
-    const styles = document.querySelector('style').innerHTML;
-    const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
-    
-    const newspaperNode = this.cloneNode(true);
-    newspaperNode.style.display = 'block';
-    newspaperNode.style.margin = '40px auto';
-
-    const htmlContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Siam Times</title>
-    ${fonts}
-    <style>
-        ${styles}
-        body { background: #e9ecef; margin: 0; padding: 20px; }
-    </style>
-</head>
-<body>
-    ${newspaperNode.outerHTML}
-</body>
-</html>`;
-
-    navigator.clipboard.writeText(htmlContent).then(() => {
-        const toast = document.createElement('div');
-        toast.innerHTML = '✅ <b>Copied!</b><br>HTML code copied successfully.<br><span style="font-size:12px; font-weight:normal;">You can paste it into a new .html file.</span>';
-        Object.assign(toast.style, {
-            position: 'fixed',
-            bottom: '30px',
-            right: '30px',
-            background: '#212529',
-            color: 'white',
-            padding: '15px 20px',
-            borderRadius: '8px',
-            boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
-            fontFamily: 'Sarabun, sans-serif',
-            zIndex: '9999',
-            opacity: '0',
-            transition: 'opacity 0.3s ease-in-out',
-            textAlign: 'center',
-            lineHeight: '1.4'
+            navigator.clipboard.writeText(htmlContent).then(() => {
+                const toast = document.createElement('div');
+                toast.innerHTML = '✅ <b>Copied!</b><br>HTML code copied successfully.<br><span style="font-size:12px; font-weight:normal;">You can paste it into a new .html file.</span>';
+                Object.assign(toast.style, {
+                    position: 'fixed',
+                    bottom: '30px',
+                    right: '30px',
+                    background: '#212529',
+                    color: 'white',
+                    padding: '15px 20px',
+                    borderRadius: '8px',
+                    boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
+                    fontFamily: 'Sarabun, sans-serif',
+                    zIndex: '9999',
+                    opacity: '0',
+                    transition: 'opacity 0.3s ease-in-out',
+                    textAlign: 'center',
+                    lineHeight: '1.4'
+                });
+                document.body.appendChild(toast);
+                
+                setTimeout(() => toast.style.opacity = '1', 10);
+                
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3500);
+                
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('An error occurred while copying HTML code.');
+            });
         });
-        document.body.appendChild(toast);
-        
-        setTimeout(() => toast.style.opacity = '1', 10);
-        
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 300);
-        }, 3500);
-        
-    }).catch(err => {
-        console.error('Copy failed:', err);
-        alert('An error occurred while copying HTML code.');
-    });
-});
     </script>
-
 </body>
 </html>
