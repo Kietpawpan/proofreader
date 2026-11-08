@@ -593,7 +593,7 @@
         <div class="newspaper-container lang-en" id="result-newspaper">
             <div class="nyt-top-row">
                 <div class="nyt-slogan-box">
-                    "All the News<br>That's Nice to Print"
+                    "All the News<br>That's Nice to Post"
                 </div>
                 <div class="nyt-header">The Siam Times</div>
             </div>
@@ -1083,7 +1083,6 @@
             const enMonths = 'JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY AUGUST SEPTEMBER OCTOBER NOVEMBER DECEMBER'.split(' ');
             const thMonths = 'มกราคม กุมภาพันธ์ มีนาคม เมษายน พฤษภาคม มิถุนายน กรกฎาคม สิงหาคม กันยายน ตุลาคม พฤศจิกายน ธันวาคม'.split(' ');
 
-            // ตรวจสอบการกดยืนยันเพื่อรันเลข
             const isFinalConfirmed = document.getElementById('confirm-issue').checked;
 
             let issueNo = 1;
@@ -1109,7 +1108,6 @@
             }
             if(needsTranslation) hideLoader();
 
-            // ล้างค่าที่เลือกไว้ออกเพื่อกันการกดซ้ำแบบไม่ได้ตั้งใจ
             document.getElementById('confirm-issue').checked = false;
 
             let dateHTML = '';
