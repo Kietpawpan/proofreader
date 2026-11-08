@@ -476,7 +476,6 @@
 </head>
 <body>
 
-    <!-- Authentication Overlay -->
     <div id="auth-overlay">
         <div class="auth-box">
             <h2>Authentication Required</h2>
@@ -487,7 +486,6 @@
         </div>
     </div>
 
-    <!-- Wrap all existing content in main-app -->
     <div id="main-app">
         <div class="loader-overlay" id="global-loader">
             <div class="spinner"></div>
@@ -575,6 +573,13 @@
             </div>
         </div>
         
+        <div style="text-align: center; margin-bottom: 10px;">
+            <label style="font-size: 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: #b91d1d; font-weight: bold; font-family: 'Sarabun', sans-serif;">
+                <input type="checkbox" id="confirm-issue" style="transform: scale(1.3); cursor: pointer;">
+                ยืนยัน Final Draft (เพื่อรันเลขฉบับที่ใหม่)
+            </label>
+        </div>
+        
         <div class="btn-group">
             <button class="btn-proofread" onclick="compareTexts()">Show Proofread Marks</button>
             <button class="btn-nyt" onclick="generateNewspaper('en')">Read as English Newspaper</button>
@@ -605,7 +610,6 @@
     </div>
 
     <script>
-        // ประกาศตัวแปรเก็บ URL ของ Google Apps Script และรหัสผ่านที่ตรวจสอบแล้ว
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySUJvCYbctRhB00m_h5_8w5sA-FBy5gM-sCMeAOavM5g2dTQH6pTAUtc0jlEyTQvKK/exec';
         let appSecretKey = '';
 
@@ -661,7 +665,6 @@
             }
         });
 
-        // Original Script Logic Below
         let uploadedImageSrc = '';
 
         function showLoader(text) {
@@ -996,8 +999,6 @@
                 }
             }
 
-            if(needsTranslation) hideLoader();
-
             const paragraphs = processedText.split(/\n+/).filter(p => p.trim() !== '');
             
             if (paragraphs.length >= 1) {
@@ -1082,7 +1083,34 @@
             const enMonths = 'JANUARY FEBRUARY MARCH APRIL MAY JUNE JULY AUGUST SEPTEMBER OCTOBER NOVEMBER DECEMBER'.split(' ');
             const thMonths = 'มกราคม กุมภาพันธ์ มีนาคม เมษายน พฤษภาคม มิถุนายน กรกฎาคม สิงหาคม กันยายน ตุลาคม พฤศจิกายน ธันวาคม'.split(' ');
 
-            const issueNo = (monthIdx + 1) * 10000 + dateNum * 100 + hour;
+            // ตรวจสอบการกดยืนยันเพื่อรันเลข
+            const isFinalConfirmed = document.getElementById('confirm-issue').checked;
+
+            let issueNo = 1;
+            try {
+                const issueResponse = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'getIssueNumber',
+                        secretKey: appSecretKey,
+                        increment: isFinalConfirmed
+                    })
+                });
+                const issueData = await issueResponse.json();
+                if (issueData.success && issueData.issueNo) {
+                    issueNo = issueData.issueNo;
+                } else {
+                    issueNo = (monthIdx + 1) * 10000 + dateNum * 100 + hour; 
+                }
+            } catch (error) {
+                console.error('Fetch issue error:', error);
+                issueNo = (monthIdx + 1) * 10000 + dateNum * 100 + hour; 
+            }
+            if(needsTranslation) hideLoader();
+
+            // ล้างค่าที่เลือกไว้ออกเพื่อกันการกดซ้ำแบบไม่ได้ตั้งใจ
+            document.getElementById('confirm-issue').checked = false;
 
             let dateHTML = '';
 
@@ -1091,7 +1119,10 @@
                 const dName = thDays[dayIdx];
                 const mName = thMonths[monthIdx];
                 
-                const span1 = '<span>ปีที่ ' + (year - 2020) + '</span>';
+                let publicationYear = year - 2025;
+                if (publicationYear < 1) publicationYear = 1;
+
+                const span1 = '<span>ปีที่ ' + publicationYear + '</span>';
                 const span2 = '<span>วัน' + dName + 'ที่ ' + dateNum + ' ' + mName + ' พ.ศ. ' + thYear + '</span>';
                 const span3 = '<span>ฉบับที่ ' + issueNo + '</span>';
                 
@@ -1100,7 +1131,8 @@
                 const dName = enDays[dayIdx];
                 const mName = enMonths[monthIdx];
                 
-                let volNum = year - 1851;
+                let volNum = year - 2025;
+                if (volNum < 1) volNum = 1;
                 let volRoman = '';
                 
                 while (volNum >= 1000) { volRoman += 'M'; volNum -= 1000; }
