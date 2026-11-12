@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#4a148c">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.1.0/diff.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Pridi:wght@700&family=Sarabun:ital,wght@0,400;0,700;1,400;1,700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 
     <style>
@@ -79,7 +79,9 @@
             margin-bottom: 8px;
             color: #495057;
         }
-        textarea { 
+
+        /* Rich Text Editor Styles (replaces textarea) */
+        .rich-textarea { 
             width: 100%; 
             height: 250px; 
             padding: 12px; 
@@ -87,9 +89,45 @@
             border: 1px solid #ced4da; 
             border-radius: 8px; 
             resize: vertical; 
+            overflow-y: auto;
             box-sizing: border-box;
             line-height: 1.6;
-            font-family: Lora;
+            font-family: Lora, 'Sarabun', serif;
+            background: white;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            outline: none;
+        }
+        .rich-textarea:focus {
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 2px rgba(111, 66, 193, 0.15);
+        }
+        .rich-textarea:empty:before {
+            content: attr(data-placeholder);
+            color: #6c757d;
+            pointer-events: none;
+        }
+
+        /* Formatting Toolbar Buttons */
+        .format-toolbar {
+            display: inline-flex;
+            gap: 4px;
+            margin-right: 6px;
+        }
+        .btn-format {
+            padding: 4px 10px;
+            font-size: 13px;
+            background: #f8f9fa;
+            color: #212529;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: none;
+            font-family: Lora, serif;
+            transition: all 0.2s;
+        }
+        .btn-format:hover {
+            background: #e2e6ea;
         }
         
         .ai-controls {
@@ -171,6 +209,7 @@
         }
         del { text-decoration: line-through; color: #dc3545; background: #f8d7da; padding: 2px 4px; border-radius: 4px; }
         ins { text-decoration: none; color: #198754; background: #d1e7dd; padding: 2px 4px; border-bottom: 2px dashed #198754; font-weight: bold; }
+        del u, ins u { text-decoration: underline; }
         
         .newspaper-container {
             background: #fdfbf7; 
@@ -309,13 +348,17 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
         .box-header label {
             margin-bottom: 0;
         }
         .btn-action-group {
             display: flex;
+            align-items: center;
             gap: 6px;
+            flex-wrap: wrap;
         }
         .btn-copy {
             padding: 5px 12px;
@@ -556,20 +599,32 @@
             <div class="box">
                 <div class="box-header">
                     <label for="draft">Draft</label>
-                    <button type="button" class="btn-clear" onclick="clearDraftText()">🗑 Clear Data</button>
+                    <div class="btn-action-group">
+                        <div class="format-toolbar">
+                            <button type="button" class="btn-format" title="Bold (Ctrl+B)" onmousedown="event.preventDefault(); formatEditor('draft', 'bold')"><b>B</b></button>
+                            <button type="button" class="btn-format" title="Italic (Ctrl+I)" onmousedown="event.preventDefault(); formatEditor('draft', 'italic')"><i>I</i></button>
+                            <button type="button" class="btn-format" title="Underline (Ctrl+U)" onmousedown="event.preventDefault(); formatEditor('draft', 'underline')"><u>U</u></button>
+                        </div>
+                        <button type="button" class="btn-clear" onclick="clearDraftText()">🗑 Clear Data</button>
+                    </div>
                 </div>
-                <textarea id="draft" placeholder="Paste draft text here..."></textarea>
+                <div id="draft" class="rich-textarea" contenteditable="true" data-placeholder="Paste draft text here..."></div>
             </div>
 
             <div class="box">
                 <div class="box-header">
                     <label for="final">Final</label>
                     <div class="btn-action-group">
+                        <div class="format-toolbar">
+                            <button type="button" class="btn-format" title="Bold (Ctrl+B)" onmousedown="event.preventDefault(); formatEditor('final', 'bold')"><b>B</b></button>
+                            <button type="button" class="btn-format" title="Italic (Ctrl+I)" onmousedown="event.preventDefault(); formatEditor('final', 'italic')"><i>I</i></button>
+                            <button type="button" class="btn-format" title="Underline (Ctrl+U)" onmousedown="event.preventDefault(); formatEditor('final', 'underline')"><u>U</u></button>
+                        </div>
                         <button type="button" class="btn-clear" onclick="clearFinalText()">🗑️ Clear Data</button>
                         <button class="btn-copy" id="copyBtn" onclick="copyFinalText()">📋 Copy</button>
                     </div>
                 </div>
-                <textarea id="final" placeholder="Paste final text here..."></textarea>
+                <div id="final" class="rich-textarea" contenteditable="true" data-placeholder="Paste final text here..."></div>
             </div>
         </div>
         
@@ -613,6 +668,230 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySUJvCYbctRhB00m_h5_8w5sA-FBy5gM-sCMeAOavM5g2dTQH6pTAUtc0jlEyTQvKK/exec';
         let appSecretKey = '';
 
+        /* --- Rich Text Formatting & Paste Sanitization --- */
+        function formatEditor(editorId, command) {
+            const editor = document.getElementById(editorId);
+            editor.focus();
+            document.execCommand(command, false, null);
+        }
+
+        function sanitizePastedNode(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                return document.createTextNode(node.textContent);
+            }
+            if (node.nodeType !== Node.ELEMENT_NODE) {
+                return document.createDocumentFragment();
+            }
+
+            const tag = node.tagName.toUpperCase();
+            if (tag === 'STYLE' || tag === 'SCRIPT' || tag === 'META' || tag === 'LINK') {
+                return document.createDocumentFragment();
+            }
+            if (tag === 'BR') {
+                return document.createElement('br');
+            }
+
+            const style = node.getAttribute('style') || '';
+            const isBold = tag === 'B' || tag === 'STRONG' || /font-weight\s*:\s*(bold|[789]00)/i.test(style);
+            const isItalic = tag === 'I' || tag === 'EM' || /font-style\s*:\s*italic/i.test(style);
+            const isUnderline = tag === 'U' || /text-decoration(-line)?\s*:[^;]*underline/i.test(style);
+            const isBlock = ['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE'].includes(tag);
+
+            let childFrag = document.createDocumentFragment();
+            node.childNodes.forEach(child => {
+                childFrag.appendChild(sanitizePastedNode(child));
+            });
+
+            let current = childFrag;
+            if (isUnderline) {
+                const u = document.createElement('u');
+                u.appendChild(current);
+                current = u;
+            }
+            if (isItalic) {
+                const i = document.createElement('i');
+                i.appendChild(current);
+                current = i;
+            }
+            if (isBold) {
+                const b = document.createElement('b');
+                b.appendChild(current);
+                current = b;
+            }
+
+            if (isBlock) {
+                const wrapper = document.createDocumentFragment();
+                wrapper.appendChild(current);
+                wrapper.appendChild(document.createElement('br'));
+                return wrapper;
+            }
+
+            return current;
+        }
+
+        function handleRichPaste(e) {
+            e.preventDefault();
+            const clipboardData = e.clipboardData || window.clipboardData;
+            const htmlData = clipboardData.getData('text/html');
+            const textData = clipboardData.getData('text/plain');
+
+            if (htmlData) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlData, 'text/html');
+                const cleanFrag = sanitizePastedNode(doc.body);
+                const tempDiv = document.createElement('div');
+                tempDiv.appendChild(cleanFrag);
+                let cleanedHTML = tempDiv.innerHTML.replace(/(<br\s*\/?>\s*)+$/i, '');
+                document.execCommand('insertHTML', false, cleanedHTML);
+            } else if (textData) {
+                const escaped = parseMarkdown(textData).replace(/\r?\n/g, '<br>');
+                document.execCommand('insertHTML', false, escaped);
+            }
+        }
+
+        document.getElementById('draft').addEventListener('paste', handleRichPaste);
+        document.getElementById('final').addEventListener('paste', handleRichPaste);
+
+        /* Extract plain text + character-level { b, i, u } styles from a rich editor */
+        function extractTextAndStyles(editorEl) {
+            const chars = [];
+            const styles = [];
+            const blockTags = new Set(['DIV', 'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE']);
+
+            function pushNewline() {
+                chars.push('\n');
+                styles.push({ b: false, i: false, u: false });
+            }
+
+            function walk(node, state) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent.replace(/\r/g, '');
+                    for (const ch of text) {
+                        chars.push(ch);
+                        styles.push({ ...state });
+                    }
+                    return;
+                }
+                if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+                const tag = node.tagName.toUpperCase();
+                if (tag === 'BR') {
+                    const parent = node.parentNode;
+                    const isSoleBrInBlock = parent && parent !== editorEl && blockTags.has(parent.tagName.toUpperCase()) && parent.childNodes.length === 1;
+                    if (!isSoleBrInBlock) {
+                        pushNewline();
+                    }
+                    return;
+                }
+
+                const styleAttr = node.getAttribute('style') || '';
+                const nextState = {
+                    b: state.b || tag === 'B' || tag === 'STRONG' || /font-weight\s*:\s*(bold|[789]00)/i.test(styleAttr),
+                    i: state.i || tag === 'I' || tag === 'EM' || /font-style\s*:\s*italic/i.test(styleAttr),
+                    u: state.u || tag === 'U' || /text-decoration(-line)?\s*:[^;]*underline/i.test(styleAttr)
+                };
+
+                const isBlock = node !== editorEl && blockTags.has(tag);
+                if (isBlock && chars.length > 0 && chars[chars.length - 1] !== '\n') {
+                    pushNewline();
+                }
+
+                node.childNodes.forEach(child => walk(child, nextState));
+
+                if (isBlock) {
+                    pushNewline();
+                }
+            }
+
+            walk(editorEl, { b: false, i: false, u: false });
+
+            while (chars.length > 0 && chars[chars.length - 1] === '\n') {
+                chars.pop();
+                styles.pop();
+            }
+
+            return {
+                plainText: chars.join(''),
+                styles: styles
+            };
+        }
+
+        /* Convert character-level styles into clean normalized HTML (<b>, <i>, <u>, and \n) */
+        function getEditorHTML(editorId) {
+            const editor = document.getElementById(editorId);
+            const { plainText, styles } = extractTextAndStyles(editor);
+            if (!plainText) return '';
+
+            let html = '';
+            let cur = { b: false, i: false, u: false };
+
+            for (let idx = 0; idx < plainText.length; idx++) {
+                const ch = plainText[idx];
+                if (ch === '\n') {
+                    if (cur.u) { html += '</u>'; cur.u = false; }
+                    if (cur.i) { html += '</i>'; cur.i = false; }
+                    if (cur.b) { html += '</b>'; cur.b = false; }
+                    html += '\n';
+                    continue;
+                }
+
+                const st = styles[idx];
+                if (cur.b !== st.b || cur.i !== st.i || cur.u !== st.u) {
+                    if (cur.u) { html += '</u>'; cur.u = false; }
+                    if (cur.i) { html += '</i>'; cur.i = false; }
+                    if (cur.b) { html += '</b>'; cur.b = false; }
+
+                    if (st.b) { html += '<b>'; cur.b = true; }
+                    if (st.i) { html += '<i>'; cur.i = true; }
+                    if (st.u) { html += '<u>'; cur.u = true; }
+                }
+
+                if (ch === '&') html += '&amp;';
+                else if (ch === '<') html += '&lt;';
+                else if (ch === '>') html += '&gt;';
+                else html += ch;
+            }
+
+            if (cur.u) html += '</u>';
+            if (cur.i) html += '</i>';
+            if (cur.b) html += '</b>';
+
+            return html;
+        }
+
+        function getEditorPlainText(editorId) {
+            return extractTextAndStyles(document.getElementById(editorId)).plainText;
+        }
+
+        function setEditorHTML(editorId, rawText) {
+            const editor = document.getElementById(editorId);
+            if (!rawText) {
+                editor.innerHTML = '';
+                return;
+            }
+            editor.innerHTML = parseMarkdown(rawText).replace(/\r?\n/g, '<br>');
+        }
+
+        /* Safely parse <b>, <strong>, <i>, <em>, <u> and Markdown (**bold**, *italic*, __underline__) */
+        function parseMarkdown(text) {
+            if (!text) return '';
+            let safeText = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+
+            // Restore allowed HTML formatting tags (<b>, <strong>, <i>, <em>, <u>)
+            safeText = safeText.replace(/&lt;(\/?(b|strong|i|em|u))&gt;/gi, '<$1>');
+
+            // Support Markdown formatting as well
+            safeText = safeText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            safeText = safeText.replace(/__(.*?)__/g, '<u>$1</u>');
+            safeText = safeText.replace(/(^|[^\*])\*([^\*]+?)\*(?!\*)/g, '$1<i>$2</i>');
+            safeText = safeText.replace(/(^|[^_])_([^_]+?)_(?!_)/g, '$1<i>$2</i>');
+            return safeText;
+        }
+
+        /* --- Authentication --- */
         async function checkSecretKey() {
             const inputVal = document.getElementById('secret-key-input').value.trim();
             const errorMsg = document.getElementById('auth-error');
@@ -678,32 +957,19 @@
         }
 
         function clearDraftText() {
-            const draftBox = document.getElementById('draft');
-            if (!draftBox.value.trim()) {
+            if (!getEditorPlainText('draft').trim()) {
                 alert('Draft box is already empty.');
                 return;
             }
             if (confirm('Are you sure you want to clear the Draft box?')) {
-                draftBox.value = '';
+                setEditorHTML('draft', '');
                 document.getElementById('result-proofread').style.display = 'none';
                 document.getElementById('result-newspaper').style.display = 'none';
             }
         }
 
-        function parseMarkdown(text) {
-            if (!text) return '';
-            let safeText = text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
-            safeText = safeText.replace(/__(.*?)__/g, '<strong>$1</strong>');
-            safeText = safeText.replace(/_(.*?)_/g, '<em>$1</em>');
-            return safeText;
-        }
-
         function clearFinalText() {
-            const finalBox = document.getElementById('final');
-            finalBox.value = '';
+            setEditorHTML('final', '');
             document.getElementById('result-proofread').style.display = 'none';
             document.getElementById('result-newspaper').style.display = 'none';
         }
@@ -801,10 +1067,9 @@
         }
 
         async function rewriteText() {
-            const draft = document.getElementById('draft').value;
-            const finalBox = document.getElementById('final');
+            const draftHTML = getEditorHTML('draft');
             
-            if (!draft) {
+            if (!draftHTML.trim()) {
                 alert('Please enter text in the Draft box before using AI.');
                 return;
             }
@@ -812,11 +1077,11 @@
             const style = document.getElementById('ai-style').value;
             const aiModel = document.getElementById('ai-model').value; 
             
-            finalBox.value = 'Processing with AI, please wait...';
+            setEditorHTML('final', 'Processing with AI, please wait...');
             showLoader('AI is rewriting the content, please wait...');
 
-            const instructionPrompt = "You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content. \n\nOriginal Text to rewrite:\n";
-            const augmentedDraft = instructionPrompt + draft;
+            const instructionPrompt = "You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content. IMPORTANT: Preserve any HTML formatting tags such as <b>, <i>, and <u> on the corresponding words or phrases in your rewritten output.\n\nOriginal Text to rewrite:\n";
+            const augmentedDraft = instructionPrompt + draftHTML;
 
             try {
                 const response = await fetch(SCRIPT_URL, {
@@ -833,25 +1098,61 @@
                 const data = await response.json();
                 
                 if (data.result) {
-                    finalBox.value = data.result;
+                    setEditorHTML('final', data.result);
                 } else {
-                    finalBox.value = 'Backend error: ' + (data.error || 'Unknown error');
+                    setEditorHTML('final', 'Backend error: ' + (data.error || 'Unknown error'));
                 }
             } catch (error) {
-                finalBox.value = 'Error connecting to the server.';
+                setEditorHTML('final', 'Error connecting to the server.');
                 console.error(error);
             } finally {
                 hideLoader();
             }
         }
 
+        /* Append styled text segment into <del>, <ins>, or <span> while preserving <b>, <i>, <u> */
+        function appendStyledRun(container, textStr, styleSlice) {
+            let runText = '';
+            let cur = styleSlice.length > 0 ? styleSlice[0] : { b: false, i: false, u: false };
+
+            function flushRun(text, st) {
+                if (!text) return;
+                let node = document.createTextNode(text);
+                if (st.u) { const u = document.createElement('u'); u.appendChild(node); node = u; }
+                if (st.i) { const i = document.createElement('i'); i.appendChild(node); node = i; }
+                if (st.b) { const b = document.createElement('b'); b.appendChild(node); node = b; }
+                container.appendChild(node);
+            }
+
+            for (let idx = 0; idx < textStr.length; idx++) {
+                const ch = textStr[idx];
+                const st = styleSlice[idx] || { b: false, i: false, u: false };
+
+                if (ch === '\n') {
+                    flushRun(runText, cur);
+                    runText = '';
+                    container.appendChild(document.createElement('br'));
+                    continue;
+                }
+
+                if (st.b !== cur.b || st.i !== cur.i || st.u !== cur.u) {
+                    flushRun(runText, cur);
+                    runText = ch;
+                    cur = st;
+                } else {
+                    runText += ch;
+                }
+            }
+            flushRun(runText, cur);
+        }
+
         function compareTexts() {
-            const draft = document.getElementById('draft').value;
-            const final = document.getElementById('final').value;
+            const draftData = extractTextAndStyles(document.getElementById('draft'));
+            const finalData = extractTextAndStyles(document.getElementById('final'));
             const resultDiv = document.getElementById('result-proofread');
             const newspaperDiv = document.getElementById('result-newspaper');
 
-            if (!draft && !final) {
+            if (!draftData.plainText && !finalData.plainText) {
                 alert('Please enter text in both fields');
                 return;
             }
@@ -859,22 +1160,32 @@
             newspaperDiv.style.display = 'none';
             resultDiv.style.display = 'block';
 
-            const diff = Diff.diffWords(draft, final);
+            const diff = Diff.diffWords(draftData.plainText, finalData.plainText);
             
             resultDiv.innerHTML = '';
             const fragment = document.createDocumentFragment();
 
+            let draftIdx = 0;
+            let finalIdx = 0;
+
             diff.forEach((part) => {
+                const len = part.value.length;
                 const span = document.createElement(part.added ? 'ins' : part.removed ? 'del' : 'span');
-                const lines = part.value.split('\n');
-                
-                for (let i = 0; i < lines.length; i++) {
-                    span.appendChild(document.createTextNode(lines[i]));
-                    if (i < lines.length - 1) {
-                        span.appendChild(document.createElement('br'));
-                    }
+                let styleSlice = [];
+
+                if (part.removed) {
+                    styleSlice = draftData.styles.slice(draftIdx, draftIdx + len);
+                    draftIdx += len;
+                } else if (part.added) {
+                    styleSlice = finalData.styles.slice(finalIdx, finalIdx + len);
+                    finalIdx += len;
+                } else {
+                    styleSlice = finalData.styles.slice(finalIdx, finalIdx + len);
+                    draftIdx += len;
+                    finalIdx += len;
                 }
-                
+
+                appendStyledRun(span, part.value, styleSlice);
                 fragment.appendChild(span);
             });
 
@@ -897,7 +1208,8 @@
         }
 
         async function generateNewspaper(lang) {
-            const final = document.getElementById('final').value;
+            const finalHTML = getEditorHTML('final');
+            const finalPlain = getEditorPlainText('final');
             const resultDiv = document.getElementById('result-proofread');
             const newspaperDiv = document.getElementById('result-newspaper');
             const contentDiv = document.getElementById('nyt-body');
@@ -906,7 +1218,7 @@
             const headerDiv = document.querySelector('.nyt-header');
             const footerDiv = document.getElementById('nyt-footer-display');
 
-            if (!final) {
+            if (!finalPlain.trim()) {
                 alert('Please enter text in the Final box');
                 return;
             }
@@ -914,13 +1226,13 @@
             resultDiv.style.display = 'none';
             newspaperDiv.style.display = 'block';
 
-            let processedText = final;
+            let processedText = finalHTML;
             
             const currentStyle = document.getElementById('ai-style').value;
             const aiModel = document.getElementById('ai-model').value; 
 
-            const thaiCharCount = (final.match(/[\u0E00-\u0E7F]/g) || []).length;
-            const engCharCount = (final.match(/[a-zA-Z]/g) || []).length;
+            const thaiCharCount = (finalPlain.match(/[\u0E00-\u0E7F]/g) || []).length;
+            const engCharCount = (finalPlain.match(/[a-zA-Z]/g) || []).length;
 
             let needsTranslation = false;
 
@@ -938,7 +1250,7 @@
                     
                     showLoader('AI is translating content to Thai, please wait...');
                     
-                    const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO THAI. Ensure the output is entirely in Thai. You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
+                    const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO THAI. Ensure the output is entirely in Thai. You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content. IMPORTANT: Preserve any HTML formatting tags such as <b>, <i>, and <u> on the corresponding translated words.\n\nOriginal Text:\n" + finalHTML;
                     
                     try {
                         const response = await fetch(SCRIPT_URL, {
@@ -975,7 +1287,7 @@
                     
                     showLoader('Translating to English via AI. Please wait...');
                     
-                    const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO ENGLISH. Ensure the output is entirely in English. Adapt the tone to the style of " + currentStyle + ". You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content.\n\nOriginal Text:\n" + final;
+                    const translatePrompt = "TRANSLATE THE FOLLOWING TEXT INTO ENGLISH. Ensure the output is entirely in English. Adapt the tone to the style of " + currentStyle + ". You MUST format the output strictly as follows without using any labels like 'Title:' or 'Subtitle:'. Paragraph 1 must be the Title. Paragraph 2 must be the Subtitle. Paragraph 3 must be the Image Caption. Paragraph 4 and onwards must be the Main Content. IMPORTANT: Preserve any HTML formatting tags such as <b>, <i>, and <u> on the corresponding translated words.\n\nOriginal Text:\n" + finalHTML;
                     
                     try {
                         const response = await fetch(SCRIPT_URL, {
@@ -1002,7 +1314,7 @@
             const paragraphs = processedText.split(/\n+/).filter(p => p.trim() !== '');
             
             if (paragraphs.length >= 1) {
-                titleDiv.innerText = paragraphs[0];
+                titleDiv.innerHTML = parseMarkdown(paragraphs[0]);
             }
 
             let newContentHTML = '';
@@ -1030,14 +1342,14 @@
             }
 
             if (paragraphs.length >= 2) {
-                newContentHTML += `<div class="nyt-inline-subheading">${paragraphs[1]}</div>`;
+                newContentHTML += `<div class="nyt-inline-subheading">${parseMarkdown(paragraphs[1])}</div>`;
                 
                 let imageCaption = '';
                 let bodyPars = [];
 
                 if (uploadedImageSrc) {
                     if (paragraphs.length >= 3) {
-                        imageCaption = paragraphs[2];
+                        imageCaption = parseMarkdown(paragraphs[2]);
                         bodyPars = paragraphs.slice(3); 
                     }
                     
@@ -1157,16 +1469,27 @@
             dateLineDiv.innerHTML = dateHTML;
         }
 
-        function copyFinalText() {
-            const finalBox = document.getElementById('final');
+        async function copyFinalText() {
+            const plainText = getEditorPlainText('final').trim();
+            const htmlText = getEditorHTML('final').replace(/\n/g, '<br>');
             const copyBtn = document.getElementById('copyBtn');
             
-            if (!finalBox.value.trim()) {
+            if (!plainText) {
                 alert('No text to copy.');
                 return;
             }
 
-            navigator.clipboard.writeText(finalBox.value).then(() => {
+            try {
+                if (window.ClipboardItem) {
+                    const item = new ClipboardItem({
+                        'text/plain': new Blob([plainText], { type: 'text/plain' }),
+                        'text/html': new Blob([htmlText], { type: 'text/html' })
+                    });
+                    await navigator.clipboard.write([item]);
+                } else {
+                    await navigator.clipboard.writeText(plainText);
+                }
+
                 const originalText = copyBtn.innerHTML;
                 copyBtn.innerHTML = '✅ Copied!';
                 copyBtn.style.background = '#0dcaf0';
@@ -1175,17 +1498,17 @@
                     copyBtn.innerHTML = originalText;
                     copyBtn.style.background = '#198754';
                 }, 2000);
-            }).catch(err => {
+            } catch (err) {
                 console.error('Failed to copy text: ', err);
                 alert('An error occurred. Could not copy.');
-            });
+            }
         }
 
         document.getElementById('result-newspaper').addEventListener('dblclick', function(e) {
             if (window.getSelection().toString().length > 0) return;
 
             const styles = document.querySelector('style').innerHTML;
-            const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora&family=Playfair+Display:wght@400;900&family=Pridi:wght@700&family=Sarabun:wght@400;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+            const fonts = `<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Pridi:wght@700&family=Sarabun:ital,wght@0,400;0,700;1,400;1,700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
             <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=UnifrakturMaguntia&display=swap" rel="stylesheet">`;
             
             const newspaperNode = this.cloneNode(true);
